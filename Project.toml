@@ -1,0 +1,4 @@
+name = "FiniteHorizonPOMDPs"
+uuid = "8a13bbfe-798e-11e9-2f1c-eba9ee5ef093"
+authors = ["Zachary Sunberg <sunbergzach@gmail.com>"]
+version = "0.1.0"
