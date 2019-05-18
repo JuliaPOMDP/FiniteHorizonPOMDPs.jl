@@ -7,8 +7,24 @@ This package aims to provide a standard interface for defining problems with fin
 
 The goals are to
 1. Provide a way for value-iteration-based algorithms to start at the final-stage and work backwards
-2. Be compatible with generic POMDPs.jl solvers and simulators (i.e. define isterminal correctly)
+2. Be compatible with generic POMDPs.jl solvers and simulators (i.e. define `isterminal` correctly)
 3. Provide a wrapper so that can an infinite horizon POMDP can be easily made into a finite horizon one
-4. Be compatible with other interface extensions like constrained POMDPs
+4. Be compatible with other interface extensions like constrained POMDPs and mixed observability problems
 
-Notably, to help with (4), this package does **not** define `AbstractFiniteHorizonPOMDP`.
+Notably, in accordance with goal (4), this package does **not** define `AbstractFiniteHorizonPOMDP`.
+
+## Interface
+
+- `HorizonType(::Type{<:Union{MDP,POMDP}) = InfiniteHorizon()`
+  - `FiniteHorizon`
+  - `InfiniteHorizon`
+
+`horizon(m::Union{MDP,POMDP})::Int`
+
+TODO: figure out policies
+
+## Utilities
+
+`fixhorizon(m::Union{MDP,POMDP}, T::Int)` creates one of
+  - `FiniteHorizonMDP{S, A} <: MDP{Tuple{S,Int}, A}`
+  - `FiniteHorizonPOMDP{S, A, O} <: POMDP{Tuple{S,Int}, A, O}`
