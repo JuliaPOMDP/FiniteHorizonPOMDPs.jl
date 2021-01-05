@@ -12,7 +12,6 @@ ExampleState(name::Int64, epoch::Int64)::ExampleState = ExampleState(name, epoch
 ExampleState(name::Int64)::ExampleState = ExampleState(name, 0, false)
 ExampleState(name::Int64, done::Bool)::ExampleState = ExampleState(name, 0, done)
 
-
 struct Example <: MDP{ExampleState, Symbol} # Note that our MDP is parametarized by the state and the action
     no_states::Int64 # number od statesL
     horizon::Int64
@@ -25,25 +24,20 @@ struct Example <: MDP{ExampleState, Symbol} # Note that our MDP is parametarized
     noise::Float64
 end
 
-
-# checks if the position of two states are the same
-posequal(s1::ExampleState, s2::ExampleState)::Bool = s1.name == s2.name && s1.epoch == s2.epoch
-
-
 function POMDPs.isterminal(mdp::Example, state::ExampleState)::Bool
     return state.done
 end
 
 function isreward(mdp::Example, position::Int64)::Bool
-    # position = position % mdp.no_states
-    # return position in mdp.reward_states
     return position % mdp.no_states == 1 || position % mdp.no_states == 0
 end
 
+# Checks whether state is goal state and return cost/reward correspondingly
 function POMDPs.reward(mdp::Example, s::ExampleState, a::Symbol, sp::ExampleState)::Float64
     isreward(mdp, sp.position) ? mdp.reward : mdp.actionCost
 end
 
+# Creates (mdp.horizon - 1) * mdp.no_states states to be evaluated and mdp.no_states sink states
 function POMDPs.states(mdp::Example)::Array{ExampleState}
     mdp_states = ExampleState[]
     for i=1:mdp.no_states * (mdp.horizon - 1)
@@ -65,6 +59,7 @@ POMDPs.actionindex(mdp::Example, a::Symbol)::Int64 = findall(x->x==a, POMDPs.act
 
 POMDPs.discount(mdp::Example)::Number = mdp.discount_factor
 
+# returns transition distributions - works only for 1D Gridworld with possible moves to left and to right
 function POMDPs.transition(mdp::Example, s::ExampleState, a::Symbol)::SparseCat{Vector{ExampleState},Vector{Float64}}    
     sp = ExampleState[]
     prob = Float64[]
@@ -72,13 +67,13 @@ function POMDPs.transition(mdp::Example, s::ExampleState, a::Symbol)::SparseCat{
     # add original transition target and probability
     position = s.position + mdp.no_states + mdp.actionsImpact[a]
     push!(sp, ExampleState(position, isreward(mdp, position)))
-    push!(prob, 1. - noise)
+    push!(prob, 1. - mdp.noise)
 
     # add noise transition target and probability
     noise_action = a == :l ? :r : :l
     position = s.position + mdp.no_states + mdp.actionsImpact[noise_action]
     push!(sp, ExampleState(position, isreward(mdp, position)))
-    push!(prob, noise)
+    push!(prob, mdp.noise)
 
     return SparseCat(sp, prob)
 end
