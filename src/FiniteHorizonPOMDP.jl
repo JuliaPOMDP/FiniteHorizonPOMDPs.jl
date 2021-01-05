@@ -1,5 +1,10 @@
 module FiniteHorizonPOMDP
 
-# Write your package code here.
+using POMDPs
+using POMDPModelTools
+
+include("solver.jl")
+
+greet() = print("Hello World!")
 
 end
