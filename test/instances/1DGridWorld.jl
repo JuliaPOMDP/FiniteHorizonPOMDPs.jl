@@ -64,3 +64,21 @@ POMDPs.actions(mdp::Example)::Vector{Symbol} = mdp.actions
 POMDPs.actionindex(mdp::Example, a::Symbol)::Int64 = findall(x->x==a, POMDPs.actions(mdp))[1]
 
 POMDPs.discount(mdp::Example)::Number = mdp.discount_factor
+
+function POMDPs.transition(mdp::Example, s::ExampleState, a::Symbol)::SparseCat{Vector{ExampleState},Vector{Float64}}    
+    sp = ExampleState[]
+    prob = Float64[]
+
+    # add original transition target and probability
+    position = s.position + mdp.no_states + mdp.actionsImpact[a]
+    push!(sp, ExampleState(position, isreward(mdp, position)))
+    push!(prob, 1. - noise)
+
+    # add noise transition target and probability
+    noise_action = a == :l ? :r : :l
+    position = s.position + mdp.no_states + mdp.actionsImpact[noise_action]
+    push!(sp, ExampleState(position, isreward(mdp, position)))
+    push!(prob, noise)
+
+    return SparseCat(sp, prob)
+end

@@ -16,23 +16,6 @@ println("greet!")
 
 # define POMDPS.transition method
 
-function POMDPs.transition(mdp::Example, s::ExampleState, a::Symbol)::SparseCat{Vector{ExampleState},Vector{Float64}}    
-    sp = ExampleState[]
-    prob = Float64[]
-
-    # add original transition target and probability
-    position = s.position + mdp.no_states + mdp.actionsImpact[a]
-    push!(sp, ExampleState(position, isreward(mdp, position)))
-    push!(prob, 1. - noise)
-
-    # add noise transition target and probability
-    noise_action = a == :l ? :r : :l
-    position = s.position + mdp.no_states + mdp.actionsImpact[noise_action]
-    push!(sp, ExampleState(position, isreward(mdp, position)))
-    push!(prob, noise)
-
-    return SparseCat(sp, prob)
-end
 
 # initialize the problem 
 mdp = Example(no_states, horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
