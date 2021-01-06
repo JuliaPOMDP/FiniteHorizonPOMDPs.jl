@@ -1,11 +1,11 @@
 # FiniteHorizonPOMDP
 
  Finite Horizon algorithm evaluating given problem with the use of other POMDP algorithms.  
- Currently supports ValueIterationSolver. So far tested only with 1D GridWorld(`tst/instances/...`).  
+ Currently supports ValueIterationSolver. So far tested only with 1D GridWorld(`test/instances/...`).  
 
  ## Solution approach
 
- Current solution consists of simple solver `mysolve(solver_type, mdp)` iterating and evaluating epochs and `FiniteHorizonPolicy` struct storing its results. This approach has been tested by comparisson of its results on GridWorld to results of value iteration on all epochs simultaneously. Finite horizon instance of GridWorld problem is defined in `tst/instances/1DFiniteHorizonGridWorld.jl` and infinite horizon instance is defined in `tst/instances/1DGridWorld.jl`.
+ Current solution consists of simple solver `mysolve(solver_type, mdp)` iterating and evaluating epochs and `FiniteHorizonPolicy` struct storing its results. This approach has been tested by comparisson of its results on GridWorld to results of value iteration on all epochs simultaneously. Finite horizon instance of GridWorld problem is defined in `test/instances/1DFiniteHorizonGridWorld.jl` and infinite horizon instance is defined in `test/instances/1DGridWorld.jl`.
 
 ## How to use it
 
