@@ -11,7 +11,6 @@ discount_factor = 1.
 noise = .6
 
 # MDPs initialization
-mdp = Example(no_states, horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
 fhmdp = FHExample(no_states, horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
 
 # initialize the solver
@@ -20,28 +19,16 @@ fhmdp = FHExample(no_states, horizon, actions, actionCost, actionsImpact, reward
 solver = ValueIterationSolver(max_iterations=10, belres=1e-3, include_Q=true);
 
 # Solve Value Iteration
-# VIPolicy = solve(solver, mdp);
-    
+VIPolicy = solve(solver, fhmdp);
+
 # Solve Finite Horizon by Value Iteration
-# FHPolicy = FiniteHorizonPOMDP.mysolve(ValueIterationSolver, fhmdp);
+FHPolicy = FiniteHorizonPOMDP.mysolve(fhmdp);
 
 # Compare resulting policies
-#@test VIPolicy.policy == vec(FHPolicy.policy')
-# println(vec(policy.policy'))
+@test VIPolicy.policy == vec(FHPolicy.policy')
 
-stages(mdp::MDP) = mdp.horizon
-
-Base.length(f::Iterators.Flatten) = sum(length, f.it)
-POMDPs.states(mdp::FHExample) = Iterators.flatten(FiniteHorizonPOMDP.stage_states(mdp, i)[1:mdp.no_states] for i=1:stages(mdp))
-
-println(collect(states(fhmdp)))
-println(states(mdp))
-
-# Evaluates to false because of different elements Types (ExampleState vs FHExampleState)
-@test collect(states(fhmdp)) == states(mdp)
-
-# FHPolicy = FiniteHorizonPOMDP.mysolve(fhmdp);
-
+# println(collect(states(fhmdp)))
+# println(states(mdp))
 # # println("A")
 # # println(VIPolicy.qmat)
 # # println("A")
@@ -56,5 +43,13 @@ println(states(mdp))
 # # println(FHPolicy.policy)
 # # println("A")
 
-# # Compare resulting policies
-# @test VIPolicy.policy == vec(FHPolicy.policy')
+# # Evaluates to false because of different elements Types (ExampleState vs FHExampleState)
+fh_states = collect(Iterators.flatten([FiniteHorizonPOMDP.stage_states(fhmdp, i) for i=1:fhmdp.horizon]))
+ih_states = states(fhmdp)
+
+z = zip(fh_states, ih_states)
+
+@test all((fh == ih for (fh, ih) in z))
+
+
+
