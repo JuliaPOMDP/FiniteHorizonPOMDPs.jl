@@ -17,7 +17,7 @@ fhmdp = FHExample(no_states, horizon, actions, actionCost, actionsImpact, reward
 # initialize the solver
 # max_iterations: maximum number of iterations value iteration runs for (default is 100)
 # belres: the value of Bellman residual used in the solver
-solver = ValueIterationSolver(max_iterations=20, belres=1e-3);
+solver = ValueIterationSolver(max_iterations=10, belres=1e-3, include_Q=true);
 
 # Solve Value Iteration
 # VIPolicy = solve(solver, mdp);
@@ -40,3 +40,21 @@ println(states(mdp))
 # Evaluates to false because of different elements Types (ExampleState vs FHExampleState)
 @test collect(states(fhmdp)) == states(mdp)
 
+# FHPolicy = FiniteHorizonPOMDP.mysolve(fhmdp);
+
+# # println("A")
+# # println(VIPolicy.qmat)
+# # println("A")
+# # println(FHPolicy.qmat)
+# # println("A")
+# # println(VIPolicy.util)
+# # println("A")
+# # println(FHPolicy.util)
+# # println("A")
+# # println(VIPolicy.policy)
+# # println("A")
+# # println(FHPolicy.policy)
+# # println("A")
+
+# # Compare resulting policies
+# @test VIPolicy.policy == vec(FHPolicy.policy')
