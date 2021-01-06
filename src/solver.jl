@@ -20,18 +20,15 @@ end
 
 # Policy constructor
 function FiniteHorizonPolicy(mdp::MDP)
-    return FiniteHorizonPolicy(zeros(mdp.horizon, mdp.no_states, length(mdp.actions)), zeros(mdp.horizon, mdp.no_states), zeros(Int64, mdp.horizon, mdp.no_states), ordered_actions(mdp), true, mdp)
+    return FiniteHorizonPolicy(zeros(mdp.horizon, mdp.no_states, length(mdp.actions)), zeros(mdp.horizon, mdp.no_states), ones(Int64, mdp.horizon, mdp.no_states), ordered_actions(mdp), true, mdp)
 end
 
 # Method stores record for each evaluated epoch to FiniteHorizonPolicy and returns it
-function addepochrecord(fhpolicy::FiniteHorizonPolicy, policy::Policy, mdp::MDP)    
+function addepochrecord(fhpolicy::FiniteHorizonPolicy, qmat, util, policy)    
     global fhepoch
-    fhpolicy.qmat[fhepoch, :, :] = policy.qmat[1:mdp.no_states, :]
-    fhpolicy.util[fhepoch, :] = policy.util[1:mdp.no_states]
-    if fhepoch == mdp.horizon - 1
-        fhpolicy.policy[mdp.horizon, :] = ones(Int64, mdp.no_states)
-    end
-    fhpolicy.policy[fhepoch, :] = policy.policy[1:mdp.no_states]
+    fhpolicy.qmat[fhepoch, :, :] = qmat
+    fhpolicy.util[fhepoch, :] = util
+    fhpolicy.policy[fhepoch, :] = policy
     return fhpolicy
 end
 
@@ -55,10 +52,9 @@ fhepoch = -1
 # The problem is that I am not able to use for example DiscreteValueIteration.solve() as I do not know the Solver in advance
 
 # MDP given horizon 5 assumes that agent can move 4 times
-# 
-function mysolve(solverType::Type{<:Solver}, mdp::MDP; verbose::Bool=false)
+function mysolve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
     fhpolicy = FiniteHorizonPolicy(mdp)
-    solver = solverType(max_iterations=1, verbose=verbose)
+    util = fill(0., mdp.no_states)
 
     for epoch=mdp.horizon-1:-1:1
         # Store number of epoch to global variable in order to work properly
@@ -69,35 +65,26 @@ function mysolve(solverType::Type{<:Solver}, mdp::MDP; verbose::Bool=false)
             println("EPOCH: $epoch")
         end
 
-        policy = solve(solver, mdp)
+        stage_q, util, pol = valueiterationsolver(mdp, epoch, util)
 
-        fhpolicy = addepochrecord(fhpolicy, policy, mdp)
+        fhpolicy = addepochrecord(fhpolicy, stage_q, util, pol)
 
         if verbose
             println("POLICY\n")
             println("QMAT")
-            println(policy.qmat)
+            println(stage_q)
             println("util")
-            println(policy.util)
+            println(util)
             println("policy")
-            println(policy.policy)
-            println("action_map")
-            println(policy.action_map)
-            println("include_Q")
-            println(policy.include_Q)
-            println("mdp")
-            println(policy.mdp)
+            println(policy)
+            # println("action_map")
+            # println(policy.action_map)
+            # println("include_Q")
+            # println(policy.include_Q)
+            # println("mdp")
+            # println(policy.mdp)
             println("\n\n\n")
-            # print(policy)
-            # println(Dict(map((x, y) -> Pair(x.name + (x.epoch - mdp.epoch) * (one_epoch_states_no / 2), y), ordered_states(mdp)[1:one_epoch_states_no], policy.action_map[policy.policy][1:one_epoch_states_no])))
-            # println(Dict(map((x, y) -> Pair(x.name + (x.epoch - mdp.epoch) * (one_epoch_states_no / 2), y), ordered_states(mdp)[1:one_epoch_states_no], policy.util[1:one_epoch_states_no])))
         end
-
-        # Util matrix has to be changed in such a way that the values are moved from current epoch (1:mdp.no_states) to following epoch(mdp.no_states + 1:mdp.no_states * 2)
-        policy.util[mdp.no_states + 1:mdp.no_states * 2] = policy.util[1:mdp.no_states]
-        policy.util[1:mdp.no_states] = zeros(mdp.no_states)
-
-        solver = solverType(max_iterations=1, verbose=verbose, init_util=policy.util)
     end
 
     return fhpolicy

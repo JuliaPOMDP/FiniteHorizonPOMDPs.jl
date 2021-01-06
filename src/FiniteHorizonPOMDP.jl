@@ -3,8 +3,8 @@ module FiniteHorizonPOMDP
 using POMDPs
 using POMDPModelTools
 
-include("solver.jl")
+include("valueiteration.jl")
 
-greet() = print("Hello World!")
+include("solver.jl")
 
 end
