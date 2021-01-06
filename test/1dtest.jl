@@ -20,11 +20,23 @@ fhmdp = FHExample(no_states, horizon, actions, actionCost, actionsImpact, reward
 solver = ValueIterationSolver(max_iterations=20, belres=1e-3);
 
 # Solve Value Iteration
-VIPolicy = solve(solver, mdp);
+# VIPolicy = solve(solver, mdp);
     
 # Solve Finite Horizon by Value Iteration
-FHPolicy = FiniteHorizonPOMDP.mysolve(ValueIterationSolver, fhmdp);
+# FHPolicy = FiniteHorizonPOMDP.mysolve(ValueIterationSolver, fhmdp);
 
 # Compare resulting policies
-@test VIPolicy.policy == vec(FHPolicy.policy')
+#@test VIPolicy.policy == vec(FHPolicy.policy')
 # println(vec(policy.policy'))
+
+stages(mdp::MDP) = mdp.horizon
+
+Base.length(f::Iterators.Flatten) = sum(length, f.it)
+POMDPs.states(mdp::FHExample) = Iterators.flatten(FiniteHorizonPOMDP.stage_states(mdp, i)[1:mdp.no_states] for i=1:stages(mdp))
+
+println(collect(states(fhmdp)))
+println(states(mdp))
+
+# Evaluates to false because of different elements Types (ExampleState vs FHExampleState)
+@test collect(states(fhmdp)) == states(mdp)
+
