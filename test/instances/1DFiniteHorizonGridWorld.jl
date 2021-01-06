@@ -43,7 +43,7 @@ end
 function FiniteHorizonPOMDP.stage_states(mdp::FHExample, epoch::Int64)::Array{FHExampleState}
     mdp_states = FHExampleState[]
     for i=1:mdp.no_states
-        push!(mdp_states, FHExampleState(i, epoch, isreward(mdp, i)))
+        push!(mdp_states, FHExampleState(i, epoch, isreward(mdp, i) || epoch==mdp.horizon))
     end
    
     return mdp_states
@@ -54,13 +54,29 @@ function FiniteHorizonPOMDP.stage_stateindex(mdp::FHExample, s::FHExampleState, 
     return s.position
 end
 
-function FiniteHorizonPOMDP.stage_actions(mdp::FHExample)
+function FiniteHorizonPOMDP.stage_actions(mdp::FHExample, stage::Int64)
     mdp.actions
 end
 
-function FiniteHorizonPOMDP.stage_actions(mdp::FHExample, epoch::Int64)
-    FiniteHorizonPOMDP.stage_actions(mdp)
+function FiniteHorizonPOMDP.stage_actions(mdp::FHExample, s::FHExampleState, stage::Int64)
+    mdp.actions
 end
+
+# Creates (mdp.horizon - 1) * mdp.no_states states to be evaluated and mdp.no_states sink states
+function POMDPs.states(mdp::FHExample)::Array{FHExampleState}
+    mdp_states = FHExampleState[]
+    for e=1:mdp.horizon
+        for i=1:mdp.no_states
+            push!(mdp_states, FHExampleState(i, e, isreward(mdp, i) || e == mdp.horizon))
+        end
+    end
+   
+    return mdp_states
+end
+
+POMDPs.stateindex(mdp::FHExample, s::FHExampleState)::Int64 = s.position + (s.epoch - 1) * mdp.no_states
+
+POMDPs.actions(mdp::FHExample)::Vector{Symbol} = mdp.actions
 
 POMDPs.actionindex(mdp::FHExample, a::Symbol)::Int64 = findall(x->x==a, POMDPs.actions(mdp))[1]
 
@@ -73,13 +89,13 @@ function POMDPs.transition(mdp::FHExample, s::FHExampleState, a::Symbol)::Sparse
 
     # add original transition target and probability
     position = s.position + mdp.actionsImpact[a]
-    push!(sp, FHExampleState(position, isreward(mdp, position)))
+    push!(sp, FHExampleState(position, s.epoch + 1, isreward(mdp, position)))
     push!(prob, 1. - mdp.noise)
 
     # add noise transition target and probability
     noise_action = a == :l ? :r : :l
     position = s.position + mdp.actionsImpact[noise_action]
-    push!(sp, FHExampleState(position, isreward(mdp, position)))
+    push!(sp, FHExampleState(position, s.epoch + 1, isreward(mdp, position)))
     push!(prob, mdp.noise)
 
     return SparseCat(sp, prob)

@@ -6,7 +6,7 @@ using POMDPModelTools
 
 using DiscreteValueIteration
 
-include("instances/1DGridWorld.jl")
+# include("instances/1DGridWorld.jl")
 include("instances/1DFiniteHorizonGridWorld.jl")
 
 @testset "1DGridWorld" begin
