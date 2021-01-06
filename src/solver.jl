@@ -35,13 +35,11 @@ end
 # In order to run Infinite Horizon MDPs one has to implement these functions
 # User has to implement these fuctions in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
 function stage_states(mdp::MDP, epoch::Int64) end
-POMDPs.states(mdp::MDP) = stage_states(mdp, fhepoch)
 
 function stage_actions(mdp::MDP, fhepoch::Int64) end
-POMDPs.actions(mdp::MDP) = stage_actions(mdp, fhepoch)
+function stage_actions(mdp::MDP, s, fhepoch::Int64) end
 
 function stage_stateindex(mdp::MDP, s, epoch::Int64) end
-POMDPs.stateindex(mdp::MDP, s) = stage_stateindex(mdp, s, fhepoch)
 
 # Global variable for storing number of epoch in order to pass it to functions from outer solvers
 # Is there a better way to achieve this?
