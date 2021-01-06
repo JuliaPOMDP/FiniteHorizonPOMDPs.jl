@@ -45,18 +45,13 @@ function FiniteHorizonPOMDP.stage_states(mdp::FHExample, epoch::Int64)::Array{FH
     for i=1:mdp.no_states
         push!(mdp_states, FHExampleState(i, epoch, isreward(mdp, i)))
     end
-
-    for i=1:mdp.no_states
-        push!(mdp_states, FHExampleState(i, epoch + 1, true))
-    end
    
     return mdp_states
 end
 
 # Implementation of function that are replacing POMDPs.states, POMDPs.actions and POMDPs.state_index in FiniteHorizonPOMDPs Solver
 function FiniteHorizonPOMDP.stage_stateindex(mdp::FHExample, s::FHExampleState, epoch::Int64)::Int64
-    epoch == s.epoch && return s.position
-    s.position + mdp.no_states
+    return s.position
 end
 
 function FiniteHorizonPOMDP.stage_actions(mdp::FHExample)
