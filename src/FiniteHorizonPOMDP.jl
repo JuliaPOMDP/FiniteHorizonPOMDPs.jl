@@ -3,8 +3,14 @@ module FiniteHorizonPOMDP
 using POMDPs
 using POMDPModelTools
 
-include("valueiteration.jl")
+import POMDPs: Policy, action
 
+export 
+    FiniteHorizonPolicy,
+    solve,
+    action
+
+include("valueiteration.jl")
 include("solver.jl")
 
 end

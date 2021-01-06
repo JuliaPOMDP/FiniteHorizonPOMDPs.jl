@@ -51,6 +51,10 @@ end
 
 # Implementation of function that are replacing POMDPs.states, POMDPs.actions and POMDPs.state_index in FiniteHorizonPOMDPs Solver
 function FiniteHorizonPOMDP.stage_stateindex(mdp::FHExample, s::FHExampleState, epoch::Int64)::Int64
+    return s.position + (epoch - 1) * mdp.no_states
+end
+
+function FiniteHorizonPOMDP.stage_stateindex(mdp::FHExample, s::FHExampleState)::Int64
     return s.position
 end
 

@@ -23,6 +23,12 @@ function FiniteHorizonPolicy(mdp::MDP)
     return FiniteHorizonPolicy(zeros(mdp.horizon, mdp.no_states, length(mdp.actions)), zeros(mdp.horizon, mdp.no_states), ones(Int64, mdp.horizon, mdp.no_states), ordered_actions(mdp), true, mdp)
 end
 
+function action(policy::FiniteHorizonPolicy, s::S) where S
+    sidx = stage_stateindex(policy.mdp, s, s.epoch)
+    aidx = policy.policy'[sidx]
+    return policy.action_map[aidx]
+end
+
 # Method stores record for each evaluated epoch to FiniteHorizonPolicy and returns it
 function addepochrecord(fhpolicy::FiniteHorizonPolicy, qmat, util, policy)    
     global fhepoch
@@ -50,7 +56,7 @@ fhepoch = -1
 # The problem is that I am not able to use for example DiscreteValueIteration.solve() as I do not know the Solver in advance
 
 # MDP given horizon 5 assumes that agent can move 4 times
-function mysolve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
+function solve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
     fhpolicy = FiniteHorizonPolicy(mdp)
     util = fill(0., mdp.no_states)
 
