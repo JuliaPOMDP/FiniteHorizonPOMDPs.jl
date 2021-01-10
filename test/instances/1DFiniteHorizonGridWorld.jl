@@ -1,5 +1,5 @@
 using POMDPs
-using FiniteHorizonPOMDP
+using FiniteHorizonPOMDPs
 
 
 struct FHExampleState 
@@ -40,7 +40,7 @@ end
 # returns mdp.no_states * 2 long Array with first mdp.no_states corresponding to current epoch's states whose util value is to be updated
 # and another mdp.no_states vector of epoch + 1 states as way to store and uset their util value for computations
 # first half of vector is true or false depending on terminality of each state, second half is only true because solvers are not iterate through them
-function FiniteHorizonPOMDP.stage_states(mdp::FHExample, epoch::Int64)::Array{FHExampleState}
+function FiniteHorizonPOMDPs.stage_states(mdp::FHExample, epoch::Int64)::Array{FHExampleState}
     mdp_states = FHExampleState[]
     for i=1:mdp.no_states
         push!(mdp_states, FHExampleState(i, epoch, isreward(mdp, i) || epoch==mdp.horizon))
@@ -50,19 +50,19 @@ function FiniteHorizonPOMDP.stage_states(mdp::FHExample, epoch::Int64)::Array{FH
 end
 
 # Implementation of function that are replacing POMDPs.states, POMDPs.actions and POMDPs.state_index in FiniteHorizonPOMDPs Solver
-function FiniteHorizonPOMDP.stage_stateindex(mdp::FHExample, s::FHExampleState, epoch::Int64)::Int64
+function FiniteHorizonPOMDPs.stage_stateindex(mdp::FHExample, s::FHExampleState, epoch::Int64)::Int64
     return s.position + (epoch - 1) * mdp.no_states
 end
 
-function FiniteHorizonPOMDP.stage_stateindex(mdp::FHExample, s::FHExampleState)::Int64
+function FiniteHorizonPOMDPs.stage_stateindex(mdp::FHExample, s::FHExampleState)::Int64
     return s.position
 end
 
-function FiniteHorizonPOMDP.stage_actions(mdp::FHExample, stage::Int64)
+function FiniteHorizonPOMDPs.stage_actions(mdp::FHExample, stage::Int64)
     mdp.actions
 end
 
-function FiniteHorizonPOMDP.stage_actions(mdp::FHExample, s::FHExampleState, stage::Int64)
+function FiniteHorizonPOMDPs.stage_actions(mdp::FHExample, s::FHExampleState, stage::Int64)
     mdp.actions
 end
 

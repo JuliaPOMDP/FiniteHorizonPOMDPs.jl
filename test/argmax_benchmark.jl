@@ -29,7 +29,7 @@ noise = .6
 fhmdp = FHExample(no_states, horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
 
 stage_q = fill(0, (fhmdp.no_states, length(POMDPs.actions(fhmdp))))
-stage_q, util = FiniteHorizonPOMDP.valueiterationsolver(fhmdp, 1, stage_q)
+stage_q, util = FiniteHorizonPOMDPs.valueiterationsolver(fhmdp, 1, stage_q)
 println(stage_q)
 
 println("mapslices benchmark")

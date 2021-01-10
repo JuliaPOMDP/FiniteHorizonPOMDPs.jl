@@ -9,7 +9,7 @@ So far tested only with 1D GridWorld(`test/instances/...`).
 
 ## How to use it
 
- User has to define the Problem using `POMDPs.jl` requirement functions - `POMDPs.isterminal`, `POMDPs.reward`, `POMDPs.actionindex`, `POMDPs.discount` and `POMDPs.transition` (notice that `POMDPs.states`, `POMDPs.actions` and `POMDPs.stateindex` are missing), as well as to implement FiniteHorizonPOMDP functions `FiniteHorizonPOMDP.stage_states`, `FiniteHorizonPOMDP.stage_actions` and `FiniteHorizonPOMDP.stage_stateindex`.
+ User has to define the Problem using `POMDPs.jl` requirement functions - `POMDPs.isterminal`, `POMDPs.reward`, `POMDPs.actionindex`, `POMDPs.discount` and `POMDPs.transition` (notice that `POMDPs.states`, `POMDPs.actions` and `POMDPs.stateindex` are missing), as well as to implement FiniteHorizonPOMDP functions `FiniteHorizonPOMDPs.stage_states`, `FiniteHorizonPOMDPs.stage_actions` and `FiniteHorizonPOMDPs.stage_stateindex`.
 
  ## Future plan
 

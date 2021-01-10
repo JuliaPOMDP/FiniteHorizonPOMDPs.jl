@@ -1,5 +1,5 @@
 using Revise
-using FiniteHorizonPOMDP
+using FiniteHorizonPOMDPs
 using Test
 using POMDPLinter
 using POMDPModelTools
