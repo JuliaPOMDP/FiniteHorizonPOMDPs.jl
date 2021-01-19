@@ -3,7 +3,6 @@ using FiniteHorizonPOMDPs
 using Test
 using POMDPLinter
 using POMDPModelTools
-
 using DiscreteValueIteration
 
 # include("instances/1DGridWorld.jl")
