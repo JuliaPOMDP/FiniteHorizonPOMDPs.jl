@@ -1,4 +1,3 @@
-using Revise
 using FiniteHorizonPOMDPs
 using Test
 using POMDPLinter
