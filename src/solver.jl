@@ -42,9 +42,6 @@ end
 # User has to implement these fuctions in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
 function stage_states(mdp::MDP, epoch::Int64) end
 
-function stage_actions(mdp::MDP, fhepoch::Int64) end
-function stage_actions(mdp::MDP, s, fhepoch::Int64) end
-
 function stage_stateindex(mdp::MDP, s, epoch::Int64) end
 
 # Global variable for storing number of epoch in order to pass it to functions from outer solvers

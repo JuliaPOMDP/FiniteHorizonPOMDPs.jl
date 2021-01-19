@@ -58,11 +58,11 @@ function FiniteHorizonPOMDPs.stage_stateindex(mdp::FHExample, s::FHExampleState)
     return s.position
 end
 
-function FiniteHorizonPOMDPs.stage_actions(mdp::FHExample, stage::Int64)
+function POMDPs.actions(mdp::FHExample, s::FHExampleState)
     mdp.actions
 end
 
-function FiniteHorizonPOMDPs.stage_actions(mdp::FHExample, s::FHExampleState, stage::Int64)
+function POMDPs.actions(mdp::FHExample)
     mdp.actions
 end
 

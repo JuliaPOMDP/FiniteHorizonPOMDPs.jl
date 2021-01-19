@@ -2,12 +2,12 @@
 # One iteration of Value Iteration
 function valueiterationsolver(mdp::MDP, stage::Int64, util)
     next_stage_value = util               # maximum value in each row
-    stage_q = fill(0., (mdp.no_states, length(stage_actions(mdp, stage)))) # q_matrix preinitialization
+    stage_q = fill(0., (mdp.no_states, length(actions(mdp)))) # q_matrix preinitialization
     
     for s in stage_states(mdp, stage)
         isterminal(mdp, s) && continue
 
-        for a in stage_actions(mdp, s, stage)
+        for a in actions(mdp, s)
             si = stage_stateindex(mdp, s)
             ai = actionindex(mdp, a)
             for (sp, p) in weighted_iterator(transition(mdp, s, a))
