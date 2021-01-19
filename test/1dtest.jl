@@ -1,11 +1,11 @@
 
 # MDP parameters, ValueIteration minimizes the cost => cost is positive, reward is negative
 no_states = 10
-horizon = 4
+horizon = 5
 actions = [:l, :r]
 actionCost = 1.
 actionsImpact = Base.ImmutableDict(:l => -1, :r => 1)
-reward_states = [1, 10]
+reward_states = [1, no_states]
 reward = -10.
 discount_factor = 1.
 noise = .6
@@ -26,22 +26,6 @@ FHPolicy = FiniteHorizonPOMDPs.solve(mdp);
 
 # Compare resulting policies
 @test all((FiniteHorizonPOMDPs.action(FHPolicy, s) == action(VIPolicy, s) for s in states(mdp)))
-
-# println(collect(states(mdp)))
-# println(states(mdp))
-# # println("A")
-# # println(VIPolicy.qmat)
-# # println("A")
-# # println(FHPolicy.qmat)
-# # println("A")
-# # println(VIPolicy.util)
-# # println("A")
-# # println(FHPolicy.util)
-# # println("A")
-# # println(VIPolicy.policy)
-# # println("A")
-# # println(FHPolicy.policy)
-# # println("A")
 
 # # Evaluates to false because of different elements Types (ExampleState vs FHExampleState)
 fh_states = collect(Iterators.flatten([FiniteHorizonPOMDPs.stage_states(mdp, i) for i=1:mdp.horizon]))
