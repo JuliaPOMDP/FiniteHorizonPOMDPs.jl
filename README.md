@@ -1,33 +1,17 @@
-# FiniteHorizonPOMDPs.jl
-[POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl)-compatible interface for defining MDPs and POMDPs with finite horizons
+# FiniteHorizonPOMDP
 
-**Warning: This package is preliminary and may change at any time.**
+ Finite Horizon algorithm evaluating given problem using Value Iteration.  
+So far tested only with 1D GridWorld(`test/instances/...`).  
 
-This package aims to provide a standard interface for defining problems with finite horizons.
+ ## Solution approach
 
-The goals are to
-1. Provide a way for value-iteration-based algorithms to start at the final-stage and work backwards
-2. Be compatible with generic POMDPs.jl solvers and simulators (i.e. solvers should not have to check anything more than `isterminal`)
-3. Provide a wrapper so that can an infinite horizon POMDP can be easily made into a finite horizon one
-4. Be compatible with other interface extensions like constrained POMDPs and mixed observability problems
+ Current solution consists of simple solver `mysolve(mdp)` iterating and evaluating epochs and `FiniteHorizonPolicy` struct storing its results. This approach has been tested by comparisson of its results on GridWorld to results of value iteration on all epochs simultaneously. Instance of GridWorld problem is defined in `test/instances/1DFiniteHorizonGridWorld.jl`.
 
-Notably, in accordance with goal (4), this package does **not** define something like `AbstractFiniteHorizonPOMDP`.
+## How to use it
 
-## Interface
+ User has to define the Problem using `POMDPs.jl` requirement functions - `POMDPs.isterminal`, `POMDPs.reward`, `POMDPs.actionindex`, `POMDPs.discount` and `POMDPs.transition` (notice that `POMDPs.states`, `POMDPs.actions` and `POMDPs.stateindex` are missing), as well as to implement FiniteHorizonPOMDP functions `FiniteHorizonPOMDPs.stage_states`, `FiniteHorizonPOMDPs.stage_actions` and `FiniteHorizonPOMDPs.stage_stateindex`.
 
-- `HorizonLength(::Type{<:Union{MDP,POMDP}) = InfiniteHorizon()`
-  - `FiniteHorizon`
-  - `InfiniteHorizon`
+ ## Future plan
 
-`horizon(m::Union{MDP,POMDP})::Int`
-
-`stage_states(m::Union{MDP,POMDP}, t::Int)`
-`stage_stateindex(m::Union{MDP,POMDP}, t::Int, s)`
-
-`stage_actions(m::Union{MDP,POMDP}, t::Int, [s])`
-
-## Utilities
-
-`fixhorizon(m::Union{MDP,POMDP}, T::Int)` creates one of
-  - `FiniteHorizonMDP{S, A} <: MDP{Tuple{S,Int}, A}`
-  - `FiniteHorizonPOMDP{S, A, O} <: POMDP{Tuple{S,Int}, A, O}`
+ Possible future improvements: Change arrays from row oriented to column oriented
+                               Create fixhorizon(m::Union{MDP,POMDP}, T::Int) utility
