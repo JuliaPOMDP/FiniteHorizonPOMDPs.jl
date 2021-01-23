@@ -42,7 +42,7 @@ function POMDPs.gen(w::FHWrapper, ss::Tuple{<:Any,Int}, a, rng::AbstractRNG)
     end
 end
 
-POMDPs.transition(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = InStageDistribution(transition(w.m, first(ss), a), last(ss))
+POMDPs.transition(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = InStageDistribution(transition(w.m, first(ss), a), last(ss)+1)
 # TODO: convert_s
 
 POMDPs.actions(w::FHWrapper, ss::Tuple{<:Any,Int}) = actions(w.m, first(ss))
@@ -67,9 +67,9 @@ horizon(w::FHWrapper) = w.horizon
 ###############################
 # Forwarded parts of POMDPs interface
 ###############################
-POMDPs.reward(w::FHWrapper, s, a, sp) = reward(w.m, s, a, sp)
-POMDPs.reward(w::FixedHorizonPOMDPWrapper, s, a, sp, o) = reward(w.m, s, a, sp, o)
-POMDPs.reward(w::FHWrapper, s, a) = reward(w.m, s, a)
+POMDPs.reward(w::FHWrapper, ss, a, ssp) = reward(w.m, first(ss), a, first(ssp))
+POMDPs.reward(w::FixedHorizonPOMDPWrapper, ss, a, ssp, so) = reward(w.m, first(ss), a, first(ssp), first(so))
+POMDPs.reward(w::FHWrapper, ss, a) = reward(w.m, first(ss), a)
 POMDPs.actions(w::FHWrapper) = actions(w.m)
 POMDPs.actionindex(w::FHWrapper, a) = actionindex(w.m, a)
 POMDPs.discount(w::FHWrapper) = discount(w.m)
@@ -96,4 +96,4 @@ end
 
 POMDPs.mean(d::InStageDistribution) = (mean(d.d), d.stage)
 POMDPs.mode(d::InStageDistribution) = (mode(d.d), d.stage)
-POMDPs.support(d::InStageDistribution) = Iterators.product(support(d.d), 1)
+POMDPs.support(d::InStageDistribution) = Iterators.product(support(d.d), d.stage)

@@ -4,11 +4,14 @@ authors = ["Tomas Omasta <omastto1@fel.cvut.cz> and contributors"]
 version = "0.2.0"
 
 [deps]
+NamedTupleTools = "d9ec5142-1e00-5aa0-9d6a-321866360f50"
 POMDPLinter = "f3bd98c0-eb40-45e2-9eb1-f2763262d755"
 POMDPModelTools = "08074719-1b2a-587c-a292-00f91cc44415"
 POMDPs = "a93abf59-7444-517b-a68a-c42f96afdd7d"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
+NamedTupleTools = "0.13"
 POMDPLinter = "0.1"
 POMDPModelTools = "0.3"
 POMDPs = "0.9"
