@@ -1,9 +1,9 @@
 # TODO: Improve docstring https://docs.julialang.org/en/v1/manual/documentation/
-"stage_states(mdp::MDP, epoch::Int64)"
+"stage_states(mdp::MDP, stage::Int64)"
 function stage_states end
 
 # TODO: Improve docstring
-"stage_stateindex(mdp::MDP, s, epoch::Int64)::Integer"
+"stage_stateindex(mdp::MDP, s, stage::Int64)::Integer"
 function stage_stateindex end
 
 # TODO: Docstring
