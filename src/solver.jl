@@ -1,5 +1,5 @@
 # Finite Horizon algorithm evaluating problem with use of other POMDP algorithms
-# User has to implement FiniteHorizon function (stage_states, stage_actions and stage_stateindex) in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
+# User has to implement FiniteHorizon function (stage_states and stage_stateindex) in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
 # For example see FiniteHorizonPOMDP/test/instances/1DFiniteHorizonGridWorld.jl
 #
 # Currently supporting: ValueIterationSolver
