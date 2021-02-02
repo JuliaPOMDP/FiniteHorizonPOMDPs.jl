@@ -30,40 +30,27 @@ function action(policy::FiniteHorizonValuePolicy, s::S) where S
 end
 
 # Method stores record for each evaluated epoch to FiniteHorizonPolicy and returns it
-function addepochrecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy)    
-    global fhepoch
-    fhpolicy.qmat[fhepoch, :, :] = qmat
-    fhpolicy.util[fhepoch, :] = util
-    fhpolicy.policy[fhepoch, :] = policy
+function addepochrecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)    
+    fhpolicy.qmat[stage, :, :] = qmat
+    fhpolicy.util[stage, :] = util
+    fhpolicy.policy[stage, :] = policy
     return fhpolicy
 end
-
-
-# Global variable for storing number of epoch in order to pass it to functions from outer solvers
-# Is there a better way to achieve this?
-fhepoch = -1
-
-
-# Is it possible to change name of this function to solve?
-# The problem is that I am not able to use for example DiscreteValueIteration.solve() as I do not know the Solver in advance
 
 # MDP given horizon 5 assumes that agent can move 4 times
 function solve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
     fhpolicy = FiniteHorizonValuePolicy(mdp)
     util = fill(0., mdp.no_states) # XXX not all MDPs have a no_states field. Suggest using length(states(mdp))
 
-    for epoch=mdp.horizon-1:-1:1
-        # Store number of epoch to global variable in order to work properly
-        # Is there a better way to achieve this?
-        global fhepoch = epoch
+    for stage=mdp.horizon-1:-1:1
 
         if verbose
-            println("EPOCH: $epoch")
+            println("EPOCH: $stage")
         end
 
-        stage_q, util, pol = valueiterationsolver(mdp, epoch, util)
+        stage_q, util, pol = valueiterationsolver(mdp, stage, util)
 
-        fhpolicy = addepochrecord(fhpolicy, stage_q, util, pol)
+        fhpolicy = addepochrecord(fhpolicy, stage_q, util, pol, stage)
 
         if verbose
             println("POLICY\n")
@@ -73,12 +60,6 @@ function solve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
             println(util)
             println("policy")
             println(policy)
-            # println("action_map")
-            # println(policy.action_map)
-            # println("include_Q")
-            # println(policy.include_Q)
-            # println("mdp")
-            # println(policy.mdp)
             println("\n\n\n")
         end
     end
