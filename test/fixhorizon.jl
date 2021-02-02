@@ -5,7 +5,7 @@
     fhgw = fixhorizon(gw, 2)
 
     @test length(states(fhgw)) == 3*length(states(gw))
-    @test collect(stage_states(fhgw, 1)) == collect(states(gw))
+    @test collect(first(state) for state in stage_states(fhgw, 1)) == collect(states(gw))
     @test HorizonLength(fhgw) == FiniteHorizon()
     @test horizon(fhgw) == 2
     @test has_consistent_distributions(fhgw)
@@ -19,7 +19,7 @@ end
     fhb = fixhorizon(m, 2)
 
     @test length(states(fhb)) == 3*length(states(m))
-    @test collect(stage_states(fhb, 1)) == collect(states(m))
+    @test collect(first(state) for state in stage_states(fhb, 1)) == collect(states(m))
     @test HorizonLength(fhb) == FiniteHorizon()
     @test horizon(fhb) == 2
     @test has_consistent_distributions(fhb)
