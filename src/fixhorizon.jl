@@ -59,7 +59,7 @@ POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialob
 ###############################
 # FiniteHorizonPOMDPs interface
 ###############################
-stage_states(w::FHWrapper, stage::Int) = states(w.m)
+stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
 stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}, stage::Int) = stateindex(w.m, first(ss))
 HorizonLength(::Type{<:FHWrapper}) = FiniteHorizon()
 horizon(w::FHWrapper) = w.horizon
