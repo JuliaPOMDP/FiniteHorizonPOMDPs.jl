@@ -38,11 +38,6 @@ function addepochrecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy)
     return fhpolicy
 end
 
-# In order to run Infinite Horizon MDPs one has to implement these functions
-# User has to implement these fuctions in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
-function stage_states(mdp::MDP, epoch::Int64) end
-
-function stage_stateindex(mdp::MDP, s, epoch::Int64) end
 
 # Global variable for storing number of epoch in order to pass it to functions from outer solvers
 # Is there a better way to achieve this?
@@ -55,7 +50,7 @@ fhepoch = -1
 # MDP given horizon 5 assumes that agent can move 4 times
 function solve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
     fhpolicy = FiniteHorizonValuePolicy(mdp)
-    util = fill(0., mdp.no_states)
+    util = fill(0., mdp.no_states) # XXX not all MDPs have a no_states field. Suggest using length(states(mdp))
 
     for epoch=mdp.horizon-1:-1:1
         # Store number of epoch to global variable in order to work properly
