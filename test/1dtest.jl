@@ -28,11 +28,12 @@ FHPolicy = FiniteHorizonPOMDPs.solve(mdp);
 @test all((FiniteHorizonPOMDPs.action(FHPolicy, s) == action(VIPolicy, s) for s in states(mdp)))
 
 # # Evaluates to false because of different elements Types (ExampleState vs FHExampleState)
-fh_states = collect(Iterators.flatten([FiniteHorizonPOMDPs.stage_states(mdp, i) for i=1:mdp.horizon]))
+fh_states = collect(Iterators.flatten([FiniteHorizonPOMDPs.stage_states(mdp, i) for i=1:mdp.horizon + 1]))
 ih_states = states(mdp)
 
 z = zip(fh_states, ih_states)
 
+# Compare FHMDP and IHMDP states 
 @test all((fh == ih for (fh, ih) in z))
 
 

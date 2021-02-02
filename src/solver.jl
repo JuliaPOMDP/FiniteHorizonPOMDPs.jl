@@ -20,7 +20,7 @@ end
 
 # Policy constructor
 function FiniteHorizonValuePolicy(mdp::MDP)
-    return FiniteHorizonValuePolicy(zeros(mdp.horizon, mdp.no_states, length(mdp.actions)), zeros(mdp.horizon, mdp.no_states), ones(Int64, mdp.horizon, mdp.no_states), ordered_actions(mdp), true, mdp)
+    return FiniteHorizonValuePolicy(zeros(mdp.horizon + 1, mdp.no_states, length(mdp.actions)), zeros(mdp.horizon + 1, mdp.no_states), ones(Int64, mdp.horizon + 1, mdp.no_states), ordered_actions(mdp), true, mdp)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
@@ -42,7 +42,7 @@ function solve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
     fhpolicy = FiniteHorizonValuePolicy(mdp)
     util = fill(0., mdp.no_states) # XXX not all MDPs have a no_states field. Suggest using length(states(mdp))
 
-    for stage=mdp.horizon-1:-1:1
+    for stage=mdp.horizon:-1:1
 
         if verbose
             println("EPOCH: $stage")
