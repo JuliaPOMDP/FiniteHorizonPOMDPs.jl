@@ -1,7 +1,7 @@
 
 # MDP parameters, ValueIteration minimizes the cost => cost is positive, reward is negative
 no_states = 10
-_horizon = 5
+horizon = 5
 actions = [:l, :r]
 actionCost = 1.
 actionsImpact = Base.ImmutableDict(:l => -1, :r => 1)
