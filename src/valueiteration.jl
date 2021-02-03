@@ -1,18 +1,17 @@
-
 # One iteration of Value Iteration
-function valueiterationsolver(mdp::MDP, stage::Int64, util)
+function valueiterationsolver(w::FHWrapper, stage::Int64, util)
     next_stage_value = util               # maximum value in each row
-    stage_q = fill(0., (mdp.no_states, length(actions(mdp)))) # q_matrix preinitialization
+    stage_q = fill(0., (length(stage_states(w, 1)), length(actions(w)))) # q_matrix preinitialization # XXX: use length(stage_states(mdp)) instead of mdp.no_states?
     
-    for s in stage_states(mdp, stage)
-        isterminal(mdp, s) && continue
+    for s in stage_states(w, stage)
+        isterminal(w, s) && continue
 
-        for a in actions(mdp, s)
-            si = stage_stateindex(mdp, s)
-            ai = actionindex(mdp, a)
-            for (sp, p) in weighted_iterator(transition(mdp, s, a))
-                spi = stage_stateindex(mdp, sp)
-                stage_q[si, ai] += p * (reward(mdp, s, a, sp) + discount(mdp) * next_stage_value[spi])
+        for a in actions(w)
+            si = stage_stateindex(w, s, stage)
+            ai = actionindex(w, a)
+            for (sp, p) in weighted_iterator(transition(w, s, a))
+                spi = stage_stateindex(w, sp, stage + 1)
+                stage_q[si, ai] += p * (reward(w, s, a, sp) + discount(w) * next_stage_value[spi])
             end
         end
     end
