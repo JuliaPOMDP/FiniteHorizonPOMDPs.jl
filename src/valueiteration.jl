@@ -1,4 +1,8 @@
-# One iteration of Value Iteration
+"""
+    valueiterationsolver(w::FHWrapper, stage::Int64, util)
+    
+Perform one iteration of Value Iteration
+"""
 function valueiterationsolver(w::FHWrapper, stage::Int64, util)
     next_stage_value = util               # maximum value in each row
     stage_q = fill(0., (length(stage_states(w, 1)), length(actions(w))))

@@ -1,12 +1,22 @@
-# TODO: Improve docstring https://docs.julialang.org/en/v1/manual/documentation/
-"stage_states(mdp::MDP, stage::Int64)"
+"""
+    stage_states(w::FHWrapper, stage::Int)
+
+Wrap Infinite Horizon MDP's states with given stage.
+"""
 function stage_states end
 
-# TODO: Improve docstring
-"stage_stateindex(mdp::MDP, s, stage::Int64)::Integer"
+"""
+    stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}, stage::Int)::Int
+
+Compute the index of the given state in Infinite Horizon state space (only in given stage).
+"""
 function stage_stateindex end
 
-# TODO: Docstring
+"""
+    HorizonLength(::Type{<:FHWrapper})
+
+Check whether MDP is Finite or Infinite Horizon and return corresponding struct (FiniteHorizon or InfiniteHorizon).
+"""
 abstract type HorizonLength end
 
 "If HorizonLength(m::Union{MDP,POMDP}) == FiniteHorizon(), horizon(m) should be implemented and return an integer"
@@ -21,7 +31,7 @@ HorizonLength(::Type{<:Union{MDP,POMDP}}) = InfiniteHorizon()
 """
     horizon(m::Union{MDP,POMDP})::Integer
 
-Return the number of *steps* that will be taken in the (PO)MDP.
+Return the number of *steps* that will be taken in the (PO)MDP, given it is Finite Horizon.
 
 A simulation of a (PO)MDP with `horizon(m) == d` should contain *d+1* states and *d* actions and rewards.
 """
