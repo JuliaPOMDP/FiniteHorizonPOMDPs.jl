@@ -14,7 +14,7 @@ FHExampleState(position::Int64)::FHExampleState = FHExampleState(position, 0, fa
 FHExampleState(position::Int64, done::Bool)::FHExampleState = FHExampleState(position, 0, done)
 
 struct FHExample <: MDP{FHExampleState, Symbol} # Note that our MDP is parametarized by the state and the action
-    no_states::Int64 # number od states
+    no_states::Int64 # number od statesL
     horizon::Int64
     actions::Vector{Symbol}
     actionCost::Float64
@@ -37,12 +37,13 @@ function POMDPs.reward(mdp::FHExample, s::FHExampleState, a::Symbol, sp::FHExamp
     isreward(mdp, sp.position) ? mdp.reward : mdp.actionCost
 end
 
-# returns current stage's states whose util value is to be updated
-# is terminal if the stage is terminal or the state is goal
+# returns mdp.no_states * 2 long Array with first mdp.no_states corresponding to current epoch's states whose util value is to be updated
+# and another mdp.no_states vector of epoch + 1 states as way to store and uset their util value for computations
+# first half of vector is true or false depending on terminality of each state, second half is only true because solvers are not iterate through them
 function FiniteHorizonPOMDPs.stage_states(mdp::FHExample, epoch::Int64)::Array{FHExampleState}
     mdp_states = FHExampleState[]
     for i=1:mdp.no_states
-        push!(mdp_states, FHExampleState(i, epoch, isreward(mdp, i) || epoch==mdp.horizon + 1))
+        push!(mdp_states, FHExampleState(i, epoch, isreward(mdp, i) || epoch==mdp.horizon))
     end
    
     return mdp_states
@@ -68,9 +69,9 @@ end
 # Creates (mdp.horizon - 1) * mdp.no_states states to be evaluated and mdp.no_states sink states
 function POMDPs.states(mdp::FHExample)::Array{FHExampleState}
     mdp_states = FHExampleState[]
-    for e=1:mdp.horizon + 1
+    for e=1:mdp.horizon
         for i=1:mdp.no_states
-            push!(mdp_states, FHExampleState(i, e, isreward(mdp, i) || e == mdp.horizon + 1))
+            push!(mdp_states, FHExampleState(i, e, isreward(mdp, i) || e == mdp.horizon))
         end
     end
    
