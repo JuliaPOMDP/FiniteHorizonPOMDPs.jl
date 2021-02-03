@@ -22,7 +22,7 @@ struct FHExample <: MDP{FHExampleState, Symbol} # Note that our MDP is parametar
 end
 
 POMDPs.isterminal(mdp::FHExample, s::FHExampleState)::Bool = s.position in mdp.reward_states
-POMDPs.isterminal(mdp::FHExample, position::Int64)::Bool = return position in mdp.reward_states
+POMDPs.isterminal(mdp::FHExample, position::Int64)::Bool = position in mdp.reward_states
 
 function POMDPs.reward(mdp::FHExample, s::FHExampleState, a::Symbol, sp::FHExampleState)::Float64
     isterminal(mdp, sp.position) ? mdp.reward : mdp.actionCost
