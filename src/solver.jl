@@ -1,6 +1,7 @@
 # Finite Horizon algorithm evaluating problem with use of other POMDP algorithms
-# User has to implement FiniteHorizon function (stage_states and stage_stateindex) in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
-# For example see FiniteHorizonPOMDP/test/instances/1DFiniteHorizonGridWorld.jl
+# User has to define (PO)MDP instance with use of POMDPs interface methods isterminal, reward, actions, states, stateindex, actions, actionindex, discount, transition
+
+# For example see problems defined in POMDPModels package or FiniteHorizonPOMDP/test/instances/1DFiniteHorizonGridWorld.jl
 #
 # Currently supporting: ValueIterationSolver
 #
@@ -24,13 +25,13 @@ function FiniteHorizonValuePolicy(w::FHWrapper)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
-    sidx = stage_stateindex(policy.w.m, s, s.epoch)
+    sidx = stateindex(policy.w, s)
     aidx = policy.policy'[sidx]
     return policy.action_map[aidx]
 end
 
 # Method stores record for each evaluated epoch to FiniteHorizonPolicy and returns it
-function addepochrecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)    
+function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)    
     fhpolicy.qmat[stage, :, :] = qmat
     fhpolicy.util[stage, :] = util
     fhpolicy.policy[stage, :] = policy
@@ -45,12 +46,12 @@ function solve(w::FHWrapper; verbose::Bool=false, new_VI::Bool=true)
     for stage=w.horizon:-1:1
 
         if verbose
-            println("EPOCH: $stage")
+            println("Stage: $stage")
         end
 
         stage_q, util, pol = valueiterationsolver(w, stage, util)
 
-        fhpolicy = addepochrecord(fhpolicy, stage_q, util, pol, stage)
+        fhpolicy = addstagerecord(fhpolicy, stage_q, util, pol, stage)
 
         if verbose
             println("POLICY\n")

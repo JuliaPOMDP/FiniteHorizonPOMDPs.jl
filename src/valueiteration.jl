@@ -1,7 +1,7 @@
 # One iteration of Value Iteration
 function valueiterationsolver(w::FHWrapper, stage::Int64, util)
     next_stage_value = util               # maximum value in each row
-    stage_q = fill(0., (length(stage_states(w, 1)), length(actions(w)))) # q_matrix preinitialization # XXX: use length(stage_states(mdp)) instead of mdp.no_states?
+    stage_q = fill(0., (length(stage_states(w, 1)), length(actions(w))))
     
     for s in stage_states(w, stage)
         isterminal(w, s) && continue
