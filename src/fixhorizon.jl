@@ -28,7 +28,7 @@ const FHWrapper = Union{FixedHorizonMDPWrapper,FixedHorizonPOMDPWrapper}
 POMDPs.states(w::FHWrapper) = Iterators.product(states(w.m), 1:w.horizon+1)
 function POMDPs.stateindex(w::FHWrapper, ss::Tuple{<:Any, Int})
     s, k = ss
-    return (k-1)*(w.horizon) + stateindex(w.m, s)
+    return (k-1)*length(stage_states(w, 1)) + stateindex(w.m, s)
 end
 
 POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = last(ss) > w.horizon || isterminal(w.m, first(ss))
