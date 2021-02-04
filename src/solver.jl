@@ -42,12 +42,6 @@ function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, 
     return fhpolicy
 end
 
-# In order to run Infinite Horizon MDPs one has to implement these functions
-# User has to implement these fuctions in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
-function stage_states(mdp::MDP, epoch::Int64) end
-
-function stage_stateindex(mdp::MDP, s, epoch::Int64) end
-
 # MDP given horizon 5 assumes that agent can move 5 times
 function solve(w::FHWrapper; verbose::Bool=false, new_VI::Bool=true)
     fhpolicy = FiniteHorizonValuePolicy(w)
