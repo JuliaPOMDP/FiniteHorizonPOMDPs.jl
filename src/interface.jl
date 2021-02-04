@@ -26,3 +26,11 @@ Return the number of *steps* that will be taken in the (PO)MDP.
 A simulation of a (PO)MDP with `horizon(m) == d` should contain *d+1* states and *d* actions and rewards.
 """
 function horizon end
+
+
+"""
+    epoch(s::State)::Integer
+
+Return the epoch of given state
+"""
+function epoch end

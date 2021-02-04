@@ -20,11 +20,15 @@ end
 
 # Policy constructor
 function FiniteHorizonValuePolicy(mdp::MDP)
-    return FiniteHorizonValuePolicy(zeros(mdp.horizon, mdp.no_states, length(mdp.actions)), zeros(mdp.horizon, mdp.no_states), ones(Int64, mdp.horizon, mdp.no_states), ordered_actions(mdp), true, mdp)
+    return FiniteHorizonValuePolicy(zeros(horizon(mdp), no_states(mdp), length(actions(mdp))), zeros(horizon(mdp), no_states(mdp)), ones(Int64, horizon(mdp), no_states(mdp)), ordered_actions(mdp), true, mdp)
+end
+
+function no_states(mdp::MDP)
+    length(stage_states(mdp,1))
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
-    sidx = stage_stateindex(policy.mdp, s, s.epoch)
+    sidx = stage_stateindex(policy.mdp, s, epoch(s))
     aidx = policy.policy'[sidx]
     return policy.action_map[aidx]
 end
@@ -50,9 +54,9 @@ fhepoch = -1
 # MDP given horizon 5 assumes that agent can move 4 times
 function solve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
     fhpolicy = FiniteHorizonValuePolicy(mdp)
-    util = fill(0., mdp.no_states) # XXX not all MDPs have a no_states field. Suggest using length(states(mdp))
+    util = fill(0., no_states(mdp)) # XXX not all MDPs have a no_states field. Suggest using length(states(mdp))
 
-    for epoch=mdp.horizon-1:-1:1
+    for epoch=horizon(mdp)-1:-1:1
         # Store number of epoch to global variable in order to work properly
         # Is there a better way to achieve this?
         global fhepoch = epoch
