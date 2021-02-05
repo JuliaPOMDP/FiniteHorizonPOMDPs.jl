@@ -1,4 +1,11 @@
 """
+    stage(ss::Tuple{<:Any,Int})
+
+Return number of state's stage
+"""
+function stage end
+
+"""
     stage_states(w::FHWrapper, stage::Int)
 
 Wrap Infinite Horizon MDP's states with given stage.
