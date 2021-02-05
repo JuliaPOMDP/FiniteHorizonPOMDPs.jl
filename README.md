@@ -1,7 +1,4 @@
 # FiniteHorizonPOMDPs.jl
-
-
-# FiniteHorizonPOMDPs.jl
 [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl)-compatible interface for defining MDPs and POMDPs with finite horizons
 
 This package aims to provide a standard interface for defining problems with finite horizons.
