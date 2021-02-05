@@ -109,10 +109,41 @@ POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialob
 ###############################
 # FiniteHorizonPOMDPs interface
 ###############################
+"""
+    stage(ss::Tuple{<:Any,Int})
+
+Return number of state's stage
+"""
 stage(ss::Tuple{<:Any,Int}) = last(ss)
+
+"""
+    stage_states(w::FHWrapper, stage::Int)
+
+Wrap Infinite Horizon MDP's states with given stage.
+"""
 stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
+
+"""
+    stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}, stage::Int)::Int
+
+Compute the index of the given state in Infinite Horizon for given stage state space.
+"""
 stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}, stage::Int) = stateindex(w.m, first(ss))
+
+"""
+    HorizonLength(::Type{<:FHWrapper})
+
+Check whether MDP is Finite or Infinite Horizon and return corresponding struct (FiniteHorizon or InfiniteHorizon).
+"""
 HorizonLength(::Type{<:FHWrapper}) = FiniteHorizon()
+
+"""
+    horizon(m::Union{MDP,POMDP})::Integer
+
+Return the number of *steps* that will be taken in the (PO)MDP, given it is Finite Horizon.
+
+A simulation of a (PO)MDP with `horizon(m) == d` should contain *d+1* states and *d* actions and rewards.
+"""
 horizon(w::FHWrapper) = w.horizon
 
 ###############################

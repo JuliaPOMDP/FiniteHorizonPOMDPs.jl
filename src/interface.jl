@@ -1,21 +1,15 @@
 """
-    stage(ss::Tuple{<:Any,Int})
-
 Return number of state's stage
 """
 function stage end
 
 """
-    stage_states(w::FHWrapper, stage::Int)
-
-Wrap Infinite Horizon MDP's states with given stage.
+Create Infinite Horizon MDP's states for given stage.
 """
 function stage_states end
 
 """
-    stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}, stage::Int)::Int
-
-Compute the index of the given state in Infinite Horizon state space (only in given stage).
+Compute the index of the given state in Infinite Horizon for given stage state space.
 """
 function stage_stateindex end
 
@@ -34,10 +28,7 @@ struct InfiniteHorizon <: HorizonLength end
 HorizonLength(m::Union{MDP,POMDP}) = HorizonLength(typeof(m))
 HorizonLength(::Type{<:Union{MDP,POMDP}}) = InfiniteHorizon()
 
-# TODO Improve docstring
 """
-    horizon(m::Union{MDP,POMDP})::Integer
-
 Return the number of *steps* that will be taken in the (PO)MDP, given it is Finite Horizon.
 
 A simulation of a (PO)MDP with `horizon(m) == d` should contain *d+1* states and *d* actions and rewards.
