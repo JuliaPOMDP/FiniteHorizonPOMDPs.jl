@@ -15,6 +15,9 @@ fhsolver = FiniteHorizonSolver(false)
 # MDPs initialization
 mdp = CustomFHExample(no_states, _horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
 
+# check implementation of required methods 
+# @POMDPLinter.show_requirements FiniteHorizonPOMDPs.solve(fhsolver, mdp)
+
 # initialize the solver
 # max_iterations: maximum number of iterations value iteration runs for (default is 100)
 # belres: the value of Bellman residual used in the solver

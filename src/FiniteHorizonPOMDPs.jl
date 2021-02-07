@@ -5,6 +5,7 @@ using POMDPModelTools
 using Random: Random, AbstractRNG
 using NamedTupleTools: merge
 
+import POMDPLinter: @POMDP_require, @req, @subreq
 import POMDPs: Policy, action
 import Base.Iterators
 

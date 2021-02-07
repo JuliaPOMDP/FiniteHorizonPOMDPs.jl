@@ -37,6 +37,38 @@ function action(policy::FiniteHorizonValuePolicy, s::S) where S
     return policy.action_map[aidx]
 end
 
+@POMDP_require POMDPs.solve(solver::FiniteHorizonSolver, mdp::MDP) begin
+    M = typeof(mdp)
+    S = statetype(M)
+    A = actiontype(M)
+    @req discount(::M)
+    @subreq ordered_states(mdp)
+    @subreq ordered_actions(mdp)
+    @req isterminal(::M, ::S)
+    @req transition(::M,::S,::A)
+    @req reward(::M,::S,::A,::S)
+    @req stateindex(::M,::S)
+    @req actionindex(::M, ::A)
+    @req actions(::M, ::S)
+    as = actions(mdp)
+    ss = states(mdp)
+    @req length(::typeof(ss))
+    @req length(::typeof(as))
+    a = first(as)
+    s = first(ss)
+    dist = transition(mdp, s, a)
+    D = typeof(dist)
+    @req support(::D)
+    @req pdf(::D,::S)
+
+    @req stage(::S)
+    E = typeof(stage(s))
+    # @req HorizonLength(::M)
+    @req stage_states(::M, ::Int64)
+    @req stage_stateindex(::M, ::S, ::E)
+    @req horizon(::M)
+end
+
 """
     addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)
 
