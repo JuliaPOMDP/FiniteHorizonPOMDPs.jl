@@ -18,6 +18,9 @@ mdp = FHExample(no_states, actions, actionCost, actionsImpact, reward_states, re
 # Wrap mdp into finite horizon wrapper
 fhex = fixhorizon(mdp, _horizon)
 
+# check implementation of required methods 
+# @POMDPLinter.show_requirements FiniteHorizonPOMDPs.solve(fhsolver, fhex)
+
 # initialize the solver
 # max_iterations: maximum number of iterations value iteration runs for (default is 100)
 # belres: the value of Bellman residual used in the solver
