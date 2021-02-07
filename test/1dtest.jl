@@ -10,6 +10,8 @@ reward = -10.
 discount_factor = 1.
 noise = .6
 
+fhsolver = FiniteHorizonSolver(false)
+
 # MDPs initialization
 mdp = FHExample(no_states, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
 
@@ -25,7 +27,9 @@ solver = ValueIterationSolver(max_iterations=10, belres=1e-3, include_Q=true);
 VIPolicy = DiscreteValueIteration.solve(solver, fhex);
 
 # Solve Finite Horizon by Value Iteration
-FHPolicy = FiniteHorizonPOMDPs.solve(fhex);
+FHPolicy = FiniteHorizonPOMDPs.solve(fhsolver, fhex);
+
+@test_throws ArgumentError FiniteHorizonPOMDPs.solve(fhsolver, mdp)
 
 # Compare resulting policies
 @test all((FiniteHorizonPOMDPs.action(FHPolicy, s) == action(VIPolicy, s) for s in states(fhex)))

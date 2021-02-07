@@ -24,6 +24,7 @@ export
 include("fixhorizon.jl")
 
 export 
+    FiniteHorizonSolver,
     FiniteHorizonPolicy,
     solve,
     action

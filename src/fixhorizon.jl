@@ -124,6 +124,7 @@ POMDPs.reward(w::FHWrapper, ss, a) = reward(w.m, first(ss), a)
 POMDPs.actions(w::FHWrapper) = actions(w.m)
 POMDPs.actionindex(w::FHWrapper, a) = actionindex(w.m, a)
 POMDPs.discount(w::FHWrapper) = discount(w.m)
+POMDPModelTools.ordered_actions(w::FHWrapper) = ordered_actions(w.m)
 # TODO: convert_a
 
 #################################

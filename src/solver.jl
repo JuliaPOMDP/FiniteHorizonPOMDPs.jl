@@ -10,22 +10,29 @@
 
 
 # Policy struct created according to one used in DiscreteValueIteration
-mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractMatrix, P<:AbstractMatrix, A, W<:FHWrapper} <: Policy
+
+#TODO: Dosctring
+struct FiniteHorizonSolver <: Solver
+    verbose::Bool
+end
+
+#TODO: Dosctring
+mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractMatrix, P<:AbstractMatrix, A, M<:MDP} <: Policy
     qmat::Q
     util::U 
     policy::P 
     action_map::Vector{A}
     include_Q::Bool 
-    w::W
+    m::M
 end
 
 # Policy constructor
-function FiniteHorizonValuePolicy(w::FHWrapper)
-    return FiniteHorizonValuePolicy(zeros(w.horizon + 1, length(states(w.m)), length(actions(w.m))), zeros(w.horizon + 1, length(states(w.m))), ones(Int64, w.horizon + 1, length(states(w.m))), ordered_actions(w.m), true, w)
+function FiniteHorizonValuePolicy(m::MDP)
+    return FiniteHorizonValuePolicy(zeros(m.horizon + 1, length(stage_states(m, 1)), length(actions(m))), zeros(m.horizon + 1, length(stage_states(m, 1))), ones(Int64, m.horizon + 1, length(stage_states(m, 1))), ordered_actions(m), true, m)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
-    sidx = stateindex(policy.w, s)
+    sidx = stateindex(policy.m, s)
     aidx = policy.policy'[sidx]
     return policy.action_map[aidx]
 end
@@ -43,20 +50,24 @@ function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, 
 end
 
 # MDP given horizon 5 assumes that agent can move 5 times
-function solve(w::FHWrapper; verbose::Bool=false, new_VI::Bool=true)
-    fhpolicy = FiniteHorizonValuePolicy(w)
-    util = fill(0., length(states(w.m)))
+function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
+    if typeof(HorizonLength(m)) == InfiniteHorizon
+        throw(ArgumentError("m should be valid Finite Horizon MDP with methods from FiniteHorizonPOMDPs.jl/src/interface.jl implemented"))
+    end
 
-    for stage=w.horizon:-1:1
-        if verbose
+    fhpolicy = FiniteHorizonValuePolicy(m)
+    util = fill(0., length(stage_states(m, 1)))
+
+    for stage=m.horizon:-1:1
+        if solver.verbose
             println("Stage: $stage")
         end
 
-        stage_q, util, pol = valueiterationsolver(w, stage, util)
+        stage_q, util, pol = valueiterationsolver(m, stage, util)
 
         fhpolicy = addstagerecord(fhpolicy, stage_q, util, pol, stage)
 
-        if verbose
+        if solver.verbose
             println("POLICY\n")
             println("QMAT")
             println(stage_q)
