@@ -3,19 +3,19 @@
     
 Perform one iteration of Value Iteration
 """
-function valueiterationsolver(w::FHWrapper, stage::Int64, util)
+function valueiterationsolver(m::MDP, stage::Int64, util)
     next_stage_value = util               # maximum value in each row
-    stage_q = fill(0., (length(stage_states(w, 1)), length(actions(w))))
+    stage_q = fill(0., (length(stage_states(m, 1)), length(actions(m))))
     
-    for s in stage_states(w, stage)
-        isterminal(w, s) && continue
+    for s in stage_states(m, stage)
+        isterminal(m, s) && continue
 
-        for a in actions(w)
-            si = stage_stateindex(w, s, stage)
-            ai = actionindex(w, a)
-            for (sp, p) in weighted_iterator(transition(w, s, a))
-                spi = stage_stateindex(w, sp, stage + 1)
-                stage_q[si, ai] += p * (reward(w, s, a, sp) + discount(w) * next_stage_value[spi])
+        for a in actions(m)
+            si = stage_stateindex(m, s, stage)
+            ai = actionindex(m, a)
+            for (sp, p) in weighted_iterator(transition(m, s, a))
+                spi = stage_stateindex(m, sp, stage + 1)
+                stage_q[si, ai] += p * (reward(m, s, a, sp) + discount(m) * next_stage_value[spi])
             end
         end
     end
