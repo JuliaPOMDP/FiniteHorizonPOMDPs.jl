@@ -29,6 +29,7 @@ VIPolicy = DiscreteValueIteration.solve(solver, fhex);
 # Solve Finite Horizon by Value Iteration
 FHPolicy = FiniteHorizonPOMDPs.solve(fhsolver, fhex);
 
+@test typeof(HorizonLength(fhex)) != InfiniteHorizon
 @test_throws ArgumentError FiniteHorizonPOMDPs.solve(fhsolver, mdp)
 
 # Compare resulting policies
