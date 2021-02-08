@@ -16,6 +16,10 @@ struct FiniteHorizonSolver <: Solver
     verbose::Bool
 end
 
+function FiniteHorizonSolver(;verbose::Bool=false)
+    return FiniteHorizonSolver(verbose)
+end
+
 #TODO: Dosctring
 mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractMatrix, P<:AbstractMatrix, A, M<:MDP} <: Policy
     qmat::Q
@@ -28,7 +32,7 @@ end
 
 # Policy constructor
 function FiniteHorizonValuePolicy(m::MDP)
-    return FiniteHorizonValuePolicy(zeros(m.horizon + 1, length(stage_states(m, 1)), length(actions(m))), zeros(m.horizon + 1, length(stage_states(m, 1))), ones(Int64, m.horizon + 1, length(stage_states(m, 1))), ordered_actions(m), true, m)
+    return FiniteHorizonValuePolicy(zeros(horizon(m) + 1, length(stage_states(m, 1)), length(actions(m))), zeros(horizon(m) + 1, length(stage_states(m, 1))), ones(Int64, horizon(m) + 1, length(stage_states(m, 1))), ordered_actions(m), true, m)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
@@ -90,7 +94,7 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
     fhpolicy = FiniteHorizonValuePolicy(m)
     util = fill(0., length(stage_states(m, 1)))
 
-    for stage=m.horizon:-1:1
+    for stage=horizon(m):-1:1
         if solver.verbose
             println("Stage: $stage")
         end

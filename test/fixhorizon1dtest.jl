@@ -10,7 +10,7 @@ reward = -10.
 discount_factor = 1.
 noise = .6
 
-fhsolver = FiniteHorizonSolver(false)
+fhsolver = FiniteHorizonSolver()
 
 # MDPs initialization
 mdp = FHExample(no_states, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
