@@ -1,14 +1,20 @@
 """
+    stage(ss::MDPState)::Int
+
 Return number of state's stage
 """
 function stage end
 
 """
+    stage_states(m::Union{MDP,POMDP}, stage::Int)
+
 Create Infinite Horizon MDP's states for given stage.
 """
 function stage_states end
 
 """
+    stage_stateindex(m::Union{MDP,POMDP}, ss::MDPState}::Int
+    
 Compute the index of the given state in Infinite Horizon for given stage state space.
 """
 function stage_stateindex end

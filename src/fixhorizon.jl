@@ -27,6 +27,9 @@ FixedHorizonPOMDPWrapper(m::POMDP, d::Int) = FixedHorizonPOMDPWrapper{statetype(
 
 const FHWrapper = Union{FixedHorizonMDPWrapper,FixedHorizonPOMDPWrapper}
 
+###############################
+# FiniteHorizonPOMDPs interface
+###############################
 HorizonLength(::Type{<:FHWrapper}) = FiniteHorizon()
 horizon(w::FHWrapper) = w.horizon
 
