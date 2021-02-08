@@ -69,7 +69,7 @@ end
     E = typeof(stage(s))
     # @req HorizonLength(::M)
     @req stage_states(::M, ::Int64)
-    @req stage_stateindex(::M, ::S, ::E)
+    @req stage_stateindex(::M, ::S)
     @req horizon(::M)
 end
 

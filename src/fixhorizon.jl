@@ -114,7 +114,7 @@ POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialob
 ###############################
 stage(ss::Tuple{<:Any,Int}) = last(ss)
 stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
-stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}, stage::Int) = stateindex(w.m, first(ss))
+stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}) = stateindex(w.m, first(ss))
 
 ###############################
 # Forwarded parts of POMDPs interface

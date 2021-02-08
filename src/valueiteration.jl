@@ -11,10 +11,10 @@ function valueiterationsolver(m::MDP, stage::Int64, util)
         isterminal(m, s) && continue
 
         for a in actions(m)
-            si = stage_stateindex(m, s, stage)
+            si = stage_stateindex(m, s)
             ai = actionindex(m, a)
             for (sp, p) in weighted_iterator(transition(m, s, a))
-                spi = stage_stateindex(m, sp, stage + 1)
+                spi = stage_stateindex(m, sp)
                 stage_q[si, ai] += p * (reward(m, s, a, sp) + discount(m) * next_stage_value[spi])
             end
         end

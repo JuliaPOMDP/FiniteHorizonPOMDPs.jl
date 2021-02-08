@@ -36,7 +36,7 @@ function POMDPs.actions(mdp::FHExample)
     mdp.actions
 end
 
-# Creates mdp.horizon * length(stage_states(w, 1)) states to be evaluated and length(stage_states(w, 1)) sink states
+# Creates mdp.no_states states
 function POMDPs.states(mdp::FHExample)::Array{FHExampleState}
     mdp_states = FHExampleState[]
     for i=1:mdp.no_states

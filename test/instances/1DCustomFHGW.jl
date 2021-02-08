@@ -87,7 +87,7 @@ function FiniteHorizonPOMDPs.stage_states(mdp::CustomFHExample, stage::Int)
     return mdp_states
 end
 
-FiniteHorizonPOMDPs.stage_stateindex(mdp::CustomFHExample, ss::CustomFHExampleState, stage::Int) = ss.position
+FiniteHorizonPOMDPs.stage_stateindex(mdp::CustomFHExample, ss::CustomFHExampleState) = ss.position
 
 ###############################
 # Forwarded parts of POMDPs interface
