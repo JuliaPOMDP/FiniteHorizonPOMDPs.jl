@@ -25,14 +25,17 @@ struct CustomFHExample <: MDP{CustomFHExampleState, Symbol} # Note that our MDP 
     noise::Float64
 end
 
+FiniteHorizonPOMDPs.HorizonLength(::Type{<:CustomFHExample}) = FiniteHorizon()
+FiniteHorizonPOMDPs.horizon(mdp::CustomFHExample) = mdp.horizon
+
 ###################################
 # changed elements of POMDPs interface
 ###################################
 
-# Creates (mdp.horizon - 1) * mdp.no_states states to be evaluated and mdp.no_states sink states
+# Creates (horizon(mdp) - 1) * mdp.no_states states to be evaluated and mdp.no_states sink states
 function POMDPs.states(mdp::CustomFHExample)::Array{CustomFHExampleState}
     mdp_states = CustomFHExampleState[]
-    for e=1:mdp.horizon + 1
+    for e=1:horizon(mdp) + 1
         for i=1:mdp.no_states
             push!(mdp_states, CustomFHExampleState(i, e))
         end
@@ -43,7 +46,7 @@ end
 
 POMDPs.stateindex(mdp::CustomFHExample, ss::CustomFHExampleState)::Int64 = (ss.epoch - 1) * mdp.no_states + ss.position 
 
-POMDPs.isterminal(mdp::CustomFHExample, ss::CustomFHExampleState) = FiniteHorizonPOMDPs.stage(ss) > mdp.horizon || POMDPs.isterminal(mdp, ss.position)
+POMDPs.isterminal(mdp::CustomFHExample, ss::CustomFHExampleState) = FiniteHorizonPOMDPs.stage(ss) > horizon(mdp) || POMDPs.isterminal(mdp, ss.position)
 POMDPs.isterminal(mdp::CustomFHExample, position::Int64)::Bool = position in mdp.reward_states
 
 # returns transition distributions - works only for 1D Gridworld with possible moves to left and to right
@@ -85,8 +88,6 @@ function FiniteHorizonPOMDPs.stage_states(mdp::CustomFHExample, stage::Int)
 end
 
 FiniteHorizonPOMDPs.stage_stateindex(mdp::CustomFHExample, ss::CustomFHExampleState, stage::Int) = ss.position
-FiniteHorizonPOMDPs.HorizonLength(::Type{<:CustomFHExample}) = FiniteHorizon()
-FiniteHorizonPOMDPs.horizon(mdp::CustomFHExample) = mdp.horizon
 
 ###############################
 # Forwarded parts of POMDPs interface

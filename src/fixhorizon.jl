@@ -27,15 +27,18 @@ FixedHorizonPOMDPWrapper(m::POMDP, d::Int) = FixedHorizonPOMDPWrapper{statetype(
 
 const FHWrapper = Union{FixedHorizonMDPWrapper,FixedHorizonPOMDPWrapper}
 
+HorizonLength(::Type{<:FHWrapper}) = FiniteHorizon()
+horizon(w::FHWrapper) = w.horizon
+
 ###################################
 # changed elements of POMDPs interface
 ###################################
 """
    POMDPs.states(w::HFWrapper)
 
-Create a product of Infinite Horizon MDP's states with all stages (`1:w.horizon + 1`).
+Create a product of Infinite Horizon MDP's states with all stages (`1:horizon(w) + 1`).
 """
-POMDPs.states(w::FHWrapper) = Iterators.product(states(w.m), 1:w.horizon+1)
+POMDPs.states(w::FHWrapper) = Iterators.product(states(w.m), 1:horizon(w)+1)
 
 """
     POMDPS.stateindex(w::FHWrapper, ss::Tuple{<:Any, Int})
@@ -52,7 +55,7 @@ end
 
 Mark the state as terminal if its stage number if greater than horizon, else let the Infinite Horizon MDP's `isterminal` method decide.
 """
-POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = stage(ss) > w.horizon || isterminal(w.m, first(ss))
+POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = stage(ss) > horizon(w) || isterminal(w.m, first(ss))
 
 function POMDPs.gen(w::FHWrapper, ss::Tuple{<:Any,Int}, a, rng::AbstractRNG)
     out = gen(w.m, first(ss), a, rng)
@@ -83,9 +86,9 @@ POMDPs.initialstate(w::FHWrapper) = InStageDistribution(initialstate(w.m), 1)
 """
     POMDPs.observations(w::FixedHorizonPOMDPWrapper)
 
-Create a product of Infinite Horizon MDP's observations with all not-terminal stages (`1:w.horizon`).
+Create a product of Infinite Horizon MDP's observations with all not-terminal stages (`1:horizon(w)`).
 """
-POMDPs.observations(w::FixedHorizonPOMDPWrapper) = Iterators.product(observations(w.m), 1:w.horizon)
+POMDPs.observations(w::FixedHorizonPOMDPWrapper) = Iterators.product(observations(w.m), 1:horizon(w))
 
 # TODO: Write Docstring
 POMDPs.obsindex
@@ -112,8 +115,6 @@ POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialob
 stage(ss::Tuple{<:Any,Int}) = last(ss)
 stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
 stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}, stage::Int) = stateindex(w.m, first(ss))
-HorizonLength(::Type{<:FHWrapper}) = FiniteHorizon()
-horizon(w::FHWrapper) = w.horizon
 
 ###############################
 # Forwarded parts of POMDPs interface
