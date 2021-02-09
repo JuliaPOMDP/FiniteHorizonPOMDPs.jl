@@ -43,4 +43,6 @@ z = zip(fh_states, ih_states)
 @test all((fh == ih for (fh, ih) in z))
 
 
-
+println("Verbose Check")
+fhsolver = FiniteHorizonSolver(verbose=true)
+FHPolicy = FiniteHorizonPOMDPs.solve(fhsolver, mdp);
