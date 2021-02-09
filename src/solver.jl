@@ -36,8 +36,8 @@ function FiniteHorizonValuePolicy(m::MDP)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
-    sidx = stateindex(policy.m, s)
-    aidx = policy.policy'[sidx]
+    sidx = stage_stateindex(policy.m, s)
+    aidx = policy.policy[stage(s), sidx]
     return policy.action_map[aidx]
 end
 
@@ -106,11 +106,11 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
         if solver.verbose
             println("POLICY\n")
             println("QMAT")
-            println(stage_q)
+            println(fhpolicy.qmat[stage, :, :])
             println("util")
-            println(util)
+            println(fhpolicy.util[stage, :])
             println("policy")
-            println(policy)
+            println(fhpolicy.policy[stage, :])
             println("\n\n\n")
         end
     end
