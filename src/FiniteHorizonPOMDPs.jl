@@ -2,7 +2,12 @@ module FiniteHorizonPOMDPs
 
 using POMDPs
 using POMDPModelTools
+using Random: Random, AbstractRNG
+using NamedTupleTools: merge
+
+import POMDPLinter: @POMDP_require, @req, @subreq
 import POMDPs: Policy, action
+import Base.Iterators
 
 export
     stage_states,
@@ -14,7 +19,13 @@ export
 
 include("interface.jl")
 
+export
+    fixhorizon
+
+include("fixhorizon.jl")
+
 export 
+    FiniteHorizonSolver,
     FiniteHorizonPolicy,
     solve,
     action

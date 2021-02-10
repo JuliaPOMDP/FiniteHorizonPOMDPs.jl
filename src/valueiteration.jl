@@ -1,24 +1,27 @@
-
-# One iteration of Value Iteration
-function valueiterationsolver(mdp::MDP, stage::Int64, util)
-    next_stage_value = util               # maximum value in each row
-    stage_q = fill(0., (mdp.no_states, length(actions(mdp)))) # q_matrix preinitialization # XXX: use length(stage_states(mdp)) instead of mdp.no_states?
+"""
+    valueiterationsolver(w::FHWrapper, stage::Int64, util)
     
-    for s in stage_states(mdp, stage)
-        isterminal(mdp, s) && continue
+Perform one iteration of Value Iteration
+"""
+function valueiterationsolver(m::MDP, stage::Int64, util)
+    next_stage_value = util               # maximum value in each row
+    stage_q = fill(0., (length(actions(m)), length(stage_states(m, 1))))
+    
+    for s in stage_states(m, stage)
+        isterminal(m, s) && continue
 
-        for a in actions(mdp, s)
-            si = stage_stateindex(mdp, s)
-            ai = actionindex(mdp, a)
-            for (sp, p) in weighted_iterator(transition(mdp, s, a))
-                spi = stage_stateindex(mdp, sp)
-                stage_q[si, ai] += p * (reward(mdp, s, a, sp) + discount(mdp) * next_stage_value[spi])
+        for a in actions(m)
+            si = stage_stateindex(m, s)
+            ai = actionindex(m, a)
+            for (sp, p) in weighted_iterator(transition(m, s, a))
+                spi = stage_stateindex(m, sp)
+                stage_q[ai, si] += p * (reward(m, s, a, sp) + discount(m) * next_stage_value[spi])
             end
         end
     end
 
-    util = maximum(stage_q; dims=2)
-    pol = [i[2] for i in findmax(stage_q; dims=2)[2]][:]
+    util = maximum(stage_q; dims=1)
+    pol = [i[1] for i in findmax(stage_q; dims=1)[2]][:]
 
     return stage_q, util, pol
 end

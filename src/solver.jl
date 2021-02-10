@@ -1,6 +1,7 @@
 # Finite Horizon algorithm evaluating problem with use of other POMDP algorithms
-# User has to implement FiniteHorizon function (stage_states, stage_actions and stage_stateindex) in such a way that the function returns current epoch and the following one (the one that has already been evaluated)
-# For example see FiniteHorizonPOMDP/test/instances/1DFiniteHorizonGridWorld.jl
+# User has to define (PO)MDP instance with use of POMDPs interface methods isterminal, reward, actions, states, stateindex, actions, actionindex, discount, transition
+
+# For example see problems defined in POMDPModels package or FiniteHorizonPOMDP/test/instances/1DFiniteHorizonGridWorld.jl
 #
 # Currently supporting: ValueIterationSolver
 #
@@ -9,76 +10,109 @@
 
 
 # Policy struct created according to one used in DiscreteValueIteration
-mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractMatrix, P<:AbstractMatrix, A, M<:MDP} <: Policy
+
+#TODO: Dosctring
+struct FiniteHorizonSolver <: Solver
+    verbose::Bool
+end
+
+function FiniteHorizonSolver(;verbose::Bool=false)
+    return FiniteHorizonSolver(verbose)
+end
+
+#TODO: Dosctring
+mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractArray, P<:AbstractArray, A, M<:MDP} <: Policy
     qmat::Q
     util::U 
     policy::P 
     action_map::Vector{A}
     include_Q::Bool 
-    mdp::M
+    m::M
 end
 
 # Policy constructor
-function FiniteHorizonValuePolicy(mdp::MDP)
-    return FiniteHorizonValuePolicy(zeros(mdp.horizon, mdp.no_states, length(mdp.actions)), zeros(mdp.horizon, mdp.no_states), ones(Int64, mdp.horizon, mdp.no_states), ordered_actions(mdp), true, mdp)
+function FiniteHorizonValuePolicy(m::MDP)
+    no_stages = horizon(m) + 1
+    no_states = maximum(length(stage_states(m, i)) for i in 1:no_stages)
+    return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), zeros(no_states, no_stages), ones(Int64, no_states, no_stages), ordered_actions(m), true, m)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
-    sidx = stage_stateindex(policy.mdp, s, s.epoch)
-    aidx = policy.policy'[sidx]
+    sidx = stage_stateindex(policy.m, s)
+    aidx = policy.policy[sidx, stage(s)]
     return policy.action_map[aidx]
 end
 
-# Method stores record for each evaluated epoch to FiniteHorizonPolicy and returns it
-function addepochrecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy)    
-    global fhepoch
-    fhpolicy.qmat[fhepoch, :, :] = qmat
-    fhpolicy.util[fhepoch, :] = util
-    fhpolicy.policy[fhepoch, :] = policy
+@POMDP_require POMDPs.solve(solver::FiniteHorizonSolver, mdp::MDP) begin
+    M = typeof(mdp)
+    S = statetype(M)
+    A = actiontype(M)
+    @req discount(::M)
+    @subreq ordered_states(mdp)
+    @subreq ordered_actions(mdp)
+    @req isterminal(::M, ::S)
+    @req transition(::M,::S,::A)
+    @req reward(::M,::S,::A,::S)
+    @req stateindex(::M,::S)
+    @req actionindex(::M, ::A)
+    @req actions(::M, ::S)
+    as = actions(mdp)
+    ss = states(mdp)
+    @req length(::typeof(ss))
+    @req length(::typeof(as))
+    a = first(as)
+    s = first(ss)
+    dist = transition(mdp, s, a)
+    D = typeof(dist)
+    @req support(::D)
+    @req pdf(::D,::S)
+
+    @req stage(::S)
+    E = typeof(stage(s))
+    # @req HorizonLength(::M)
+    @req stage_states(::M, ::Int64)
+    @req stage_stateindex(::M, ::S)
+    @req horizon(::M)
+end
+
+"""
+    addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)
+
+Store record for given stage results to `FiniteHorizonPolicy` and return updated version.
+"""
+function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)    
+    fhpolicy.qmat[:, :, stage] = qmat
+    fhpolicy.util[:, stage] = util
+    fhpolicy.policy[:, stage] = policy
     return fhpolicy
 end
 
+# MDP given horizon 5 assumes that agent can move 5 times
+function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
+    if typeof(HorizonLength(m)) == InfiniteHorizon
+        throw(ArgumentError("Argument m should be valid Finite Horizon MDP with methods from FiniteHorizonPOMDPs.jl/src/interface.jl implemented. If you are completely sure that you implemented all of them, you should also check if you have defined HorizonLength(::Type{<:MyFHMDP})"))
+    end
 
-# Global variable for storing number of epoch in order to pass it to functions from outer solvers
-# Is there a better way to achieve this?
-fhepoch = -1
+    fhpolicy = FiniteHorizonValuePolicy(m)
+    util = fill(0., length(stage_states(m, 1)))
 
-
-# Is it possible to change name of this function to solve?
-# The problem is that I am not able to use for example DiscreteValueIteration.solve() as I do not know the Solver in advance
-
-# MDP given horizon 5 assumes that agent can move 4 times
-function solve(mdp::MDP; verbose::Bool=false, new_VI::Bool=true)
-    fhpolicy = FiniteHorizonValuePolicy(mdp)
-    util = fill(0., mdp.no_states) # XXX not all MDPs have a no_states field. Suggest using length(states(mdp))
-
-    for epoch=mdp.horizon-1:-1:1
-        # Store number of epoch to global variable in order to work properly
-        # Is there a better way to achieve this?
-        global fhepoch = epoch
-
-        if verbose
-            println("EPOCH: $epoch")
+    for stage=horizon(m):-1:1
+        if solver.verbose
+            println("Stage: $stage")
         end
 
-        stage_q, util, pol = valueiterationsolver(mdp, epoch, util)
+        stage_q, util, pol = valueiterationsolver(m, stage, util)
 
-        fhpolicy = addepochrecord(fhpolicy, stage_q, util, pol)
+        fhpolicy = addstagerecord(fhpolicy, stage_q, util, pol, stage)
 
-        if verbose
+        if solver.verbose
             println("POLICY\n")
             println("QMAT")
-            println(stage_q)
+            println(fhpolicy.qmat[:, :, stage])
             println("util")
-            println(util)
+            println(fhpolicy.util[:, stage])
             println("policy")
-            println(policy)
-            # println("action_map")
-            # println(policy.action_map)
-            # println("include_Q")
-            # println(policy.include_Q)
-            # println("mdp")
-            # println(policy.mdp)
+            println(fhpolicy.policy[:, stage])
             println("\n\n\n")
         end
     end
