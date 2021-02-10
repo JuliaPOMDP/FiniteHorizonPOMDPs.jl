@@ -4,6 +4,7 @@ using POMDPs
 using POMDPModelTools
 using Random: Random, AbstractRNG
 using NamedTupleTools: merge
+using SparseArrays
 
 import POMDPLinter: @POMDP_require, @req, @subreq
 import POMDPs: Policy, action
