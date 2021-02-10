@@ -14,11 +14,10 @@
 #TODO: Dosctring
 struct FiniteHorizonSolver <: Solver
     verbose::Bool
-    sparse::Bool
 end
 
-function FiniteHorizonSolver(;verbose::Bool=false, sparse::Bool=false)
-    return FiniteHorizonSolver(verbose, sparse)
+function FiniteHorizonSolver(;verbose::Bool=false)
+    return FiniteHorizonSolver(verbose)
 end
 
 #TODO: Dosctring
@@ -32,14 +31,10 @@ mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractArray, P<:A
 end
 
 # Policy constructor
-function FiniteHorizonValuePolicy(m::MDP, is_sparse::Bool)
+function FiniteHorizonValuePolicy(m::MDP)
     no_stages = horizon(m) + 1
-    if is_sparse
-        no_states = maximum(length(stage_states(m, i)) for i in 1:no_stages)
-        return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), sparse(zeros(no_states, no_stages)), sparse(ones(Int64, no_states, no_stages)), ordered_actions(m), true, m)
-    else
-        no_states = length(stage_states(m, 1))
-        return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), zeros(no_states, no_stages), ones(Int64, no_states, no_stages), ordered_actions(m), true, m)
+    no_states = maximum(length(stage_states(m, i)) for i in 1:no_stages)
+    return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), zeros(no_states, no_stages), ones(Int64, no_states, no_stages), ordered_actions(m), true, m)
     end
 end
 
@@ -99,7 +94,7 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
         throw(ArgumentError("Argument m should be valid Finite Horizon MDP with methods from FiniteHorizonPOMDPs.jl/src/interface.jl implemented. If you are completely sure that you implemented all of them, you should also check if you have defined HorizonLength(::Type{<:MyFHMDP})"))
     end
 
-    fhpolicy = FiniteHorizonValuePolicy(m, solver.sparse)
+    fhpolicy = FiniteHorizonValuePolicy(m)
     util = fill(0., length(stage_states(m, 1)))
 
     for stage=horizon(m):-1:1
