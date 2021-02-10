@@ -35,7 +35,6 @@ function FiniteHorizonValuePolicy(m::MDP)
     no_stages = horizon(m) + 1
     no_states = maximum(length(stage_states(m, i)) for i in 1:no_stages)
     return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), zeros(no_states, no_stages), ones(Int64, no_states, no_stages), ordered_actions(m), true, m)
-    end
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
