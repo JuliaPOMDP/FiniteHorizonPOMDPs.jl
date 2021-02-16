@@ -1,5 +1,5 @@
 """
-    stage(ss::MDPState)::Int
+    stage(m::Union{MDP,POMDP}, ss::MDPState)::Int
 
 Return number of state's stage
 """
@@ -20,8 +20,8 @@ Compute the index of the given state in Infinite Horizon for given stage state s
 function stage_stateindex end
 
 """
-    HorizonLength(::Type{<:Union{POMDP,MDP})
-    HorizonLength(::Union{POMDP,MDP})
+    HorizonLength(::Type{<:Union{MDP,POMDP})
+    HorizonLength(::Union{MDP,POMDP})
 
 Check whether MDP is Finite or Infinite Horizon and return corresponding struct (FiniteHorizon or InfiniteHorizon).
 """

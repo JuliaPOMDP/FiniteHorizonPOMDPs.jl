@@ -46,7 +46,7 @@ end
 
 POMDPs.stateindex(mdp::CustomFHExample, ss::CustomFHExampleState)::Int64 = (ss.epoch - 1) * mdp.no_states + ss.position 
 
-POMDPs.isterminal(mdp::CustomFHExample, ss::CustomFHExampleState) = FiniteHorizonPOMDPs.stage(ss) > horizon(mdp) || POMDPs.isterminal(mdp, ss.position)
+POMDPs.isterminal(mdp::CustomFHExample, ss::CustomFHExampleState) = FiniteHorizonPOMDPs.stage(mdp, ss) > horizon(mdp) || POMDPs.isterminal(mdp, ss.position)
 POMDPs.isterminal(mdp::CustomFHExample, position::Int64)::Bool = position in mdp.reward_states
 
 # returns transition distributions - works only for 1D Gridworld with possible moves to left and to right
@@ -76,7 +76,7 @@ POMDPs.actionindex(mdp::CustomFHExample, a::Symbol)::Int64 = findall(x->x==a, PO
 ###############################
 # FiniteHorizonPOMDPs interface
 ###############################
-FiniteHorizonPOMDPs.stage(ss::CustomFHExampleState) = ss.epoch
+FiniteHorizonPOMDPs.stage(mdp::CustomFHExample, ss::CustomFHExampleState) = ss.epoch
 
 function FiniteHorizonPOMDPs.stage_states(mdp::CustomFHExample, stage::Int)
     mdp_states = CustomFHExampleState[]

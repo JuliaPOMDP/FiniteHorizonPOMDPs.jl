@@ -39,7 +39,7 @@ end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
     sidx = stage_stateindex(policy.m, s)
-    aidx = policy.policy[sidx, stage(s)]
+    aidx = policy.policy[sidx, stage(policy.m, s)]
     return policy.action_map[aidx]
 end
 
@@ -67,8 +67,8 @@ end
     @req support(::D)
     @req pdf(::D,::S)
 
-    @req stage(::S)
-    E = typeof(stage(s))
+    @req stage(::M, ::S)
+    E = typeof(stage(mdp, s))
     # @req HorizonLength(::M)
     @req stage_states(::M, ::Int64)
     @req stage_stateindex(::M, ::S)

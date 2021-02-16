@@ -58,12 +58,12 @@ end
 
 Mark the state as terminal if its stage number if greater than horizon, else let the Infinite Horizon MDP's `isterminal` method decide.
 """
-POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = stage(ss) > horizon(w) || isterminal(w.m, first(ss))
+POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = stage(w, ss) > horizon(w) || isterminal(w.m, first(ss))
 
 function POMDPs.gen(w::FHWrapper, ss::Tuple{<:Any,Int}, a, rng::AbstractRNG)
     out = gen(w.m, first(ss), a, rng)
     if haskey(out, :sp)
-        return merge(out, (sp=(out.sp, stage(ss)+1),))
+        return merge(out, (sp=(out.sp, stage(w, ss)+1),))
     else
         return out
     end
@@ -74,7 +74,7 @@ end
 
 Wrap the transition result of Infinite Horizon MDP with stage number.
 """
-POMDPs.transition(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = InStageDistribution(transition(w.m, first(ss), a), stage(ss)+1)
+POMDPs.transition(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = InStageDistribution(transition(w.m, first(ss), a), stage(w, ss)+1)
 # TODO: convert_s
 
 POMDPs.actions(w::FHWrapper, ss::Tuple{<:Any,Int}) = actions(w.m, first(ss))
@@ -101,7 +101,7 @@ POMDPs.obsindex
 
 Create a product of Infinite Horizon MDP's observations given destination state and action (and original state) with original state's stage.
 """
-POMDPs.observation(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(ss))
+POMDPs.observation(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(w, ss))
 POMDPs.observation(w::FixedHorizonPOMDPWrapper, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, a, first(ssp)), last(ssp)-1)
 
 """
@@ -115,7 +115,7 @@ POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialob
 ###############################
 # FiniteHorizonPOMDPs interface
 ###############################
-stage(ss::Tuple{<:Any,Int}) = last(ss)
+stage(w::FHWrapper, ss::Tuple{<:Any,Int}) = last(ss)
 stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
 stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}) = stateindex(w.m, first(ss))
 
