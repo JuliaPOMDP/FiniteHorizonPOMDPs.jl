@@ -3,10 +3,9 @@ push!(LOAD_PATH,"../src/")
 using Documenter, FiniteHorizonPOMDPs
 
 makedocs(
-    
-    modules = [FiniteHorizonPOMDPs],
     format = Documenter.HTML(),
-    sitename = "FiniteHorizonPOMDPs.jl",   
+    sitename = "FiniteHorizonPOMDPs.jl", 
+    modules = [FiniteHorizonPOMDPs],  
     pages = [
         ##############################################
         ## MAKE SURE TO SYNC WITH docs/src/index.md ##
