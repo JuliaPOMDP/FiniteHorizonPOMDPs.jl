@@ -1,4 +1,7 @@
 # FiniteHorizonPOMDPs.jl
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/stable)
+[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/latest)
+
 [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl)-compatible interface for defining MDPs and POMDPs with finite horizons
 
 This package aims to provide a standard interface for defining problems with finite horizons.
