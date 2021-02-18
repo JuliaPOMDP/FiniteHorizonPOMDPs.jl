@@ -4,6 +4,7 @@ using POMDPs
 using POMDPModelTools
 using Random: Random, AbstractRNG
 using NamedTupleTools: merge
+using ProgressMeter: @showprogress
 
 import POMDPLinter: @POMDP_require, @req, @subreq
 import POMDPs: Policy, action

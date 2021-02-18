@@ -96,7 +96,7 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
     fhpolicy = FiniteHorizonValuePolicy(m)
     util = fill(0., length(stage_states(m, 1)))
 
-    for stage=horizon(m):-1:1
+    @showprogress 1 "Computing..." for stage=horizon(m):-1:1
         if solver.verbose
             println("Stage: $stage")
         end

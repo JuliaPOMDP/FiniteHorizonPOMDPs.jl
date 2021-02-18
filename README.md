@@ -1,6 +1,10 @@
 # FiniteHorizonPOMDPs.jl
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/stable)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/latest)
+[![codecov](https://codecov.io/gh/Omastto1/FiniteHorizonPOMDPs.jl/branch/master/graph/badge.svg?token=J65BDURJLY)](https://codecov.io/gh/Omastto1/FiniteHorizonPOMDPs.jl)
+
+
+
 
 [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl)-compatible interface for defining MDPs and POMDPs with finite horizons
 
