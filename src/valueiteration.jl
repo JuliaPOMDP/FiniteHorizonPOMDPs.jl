@@ -5,7 +5,7 @@ Perform one iteration of Value Iteration
 """
 function valueiterationsolver(m::MDP, stage::Int64, util)
     next_stage_value = util               # maximum value in each row
-    stage_q = fill(0., (length(actions(m)), length(stage_states(m, 1))))
+    stage_q = fill(0., (length(actions(m)), length(stage_states(m, stage))))
     
     for s in stage_states(m, stage)
         isterminal(m, s) && continue

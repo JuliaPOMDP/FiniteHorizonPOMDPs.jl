@@ -12,13 +12,27 @@
 # Policy struct created according to one used in DiscreteValueIteration
 
 #TODO: Dosctring
+# struct FiniteHorizonSolver <: Solver
+#     verbose::Bool
+#     # sparse::Bool
+# end
+
+# function FiniteHorizonSolver(;verbose::Bool=false)
+#     return FiniteHorizonSolver(verbose)
+# end
+
 struct FiniteHorizonSolver <: Solver
     verbose::Bool
+    sparse::Bool
 end
 
-function FiniteHorizonSolver(;verbose::Bool=false)
-    return FiniteHorizonSolver(verbose)
+function FiniteHorizonSolver(;verbose::Bool=false, sparse::Bool=false)
+    return FiniteHorizonSolver(verbose, sparse)
 end
+
+# func tion FiniteHorizonSolver(sparse::Bool=false)
+#     return FiniteHorizonSolver(false, sparse)
+# end
 
 #TODO: Dosctring
 mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractArray, P<:AbstractArray, A, M<:MDP} <: Policy
@@ -31,15 +45,32 @@ mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractArray, P<:A
 end
 
 # Policy constructor
-function FiniteHorizonValuePolicy(m::MDP)
+function FiniteHorizonValuePolicy(m::MDP, solver::FiniteHorizonSolver)
     no_stages = horizon(m) + 1
-    no_states = maximum(length(stage_states(m, i)) for i in 1:no_stages)
-    return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), zeros(no_states, no_stages), ones(Int64, no_states, no_stages), ordered_actions(m), true, m)
+    if solver.sparse
+        qmat = Matrix{Float64}[]
+        util = Vector{Float64}[]
+        policy = Vector{Int64}[]
+        for e=1:no_stages
+            no_states = length(stage_states(m, e)) 
+            push!(qmat, zeros(length(actions(m)), no_states))
+            push!(util, zeros(no_states))
+            push!(policy, ones(Int64, no_states))
+        end
+        return FiniteHorizonValuePolicy(qmat, util, policy, ordered_actions(m), true, m)
+    else
+        no_states = maximum(length(stage_states(m, i)) for i in 1:no_stages)
+        return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), zeros(no_states, no_stages), ones(Int64, no_states, no_stages), ordered_actions(m), true, m)
+    end
 end
 
-function action(policy::FiniteHorizonValuePolicy, s::S) where S
+function action(policy::FiniteHorizonValuePolicy, s::S, solver::FiniteHorizonSolver) where S
     sidx = stage_stateindex(policy.m, s)
-    aidx = policy.policy[sidx, stage(policy.m, s)]
+    if solver.sparse
+        aidx = policy.policy[stage(policy.m, s)][sidx]
+    else
+        aidx = policy.policy[sidx, stage(policy.m, s)]
+    end
     return policy.action_map[aidx]
 end
 
@@ -80,10 +111,16 @@ end
 
 Store record for given stage results to `FiniteHorizonPolicy` and return updated version.
 """
-function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)    
-    fhpolicy.qmat[:, :, stage] = qmat
-    fhpolicy.util[:, stage] = util
-    fhpolicy.policy[:, stage] = policy
+function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage, solver::FiniteHorizonSolver)
+    if solver.sparse  
+        fhpolicy.qmat[stage] = qmat
+        fhpolicy.util[stage] = vec(util)
+        fhpolicy.policy[stage] = vec(policy)
+    else
+        fhpolicy.qmat[:, :, stage] = qmat
+        fhpolicy.util[:, stage] = util
+        fhpolicy.policy[:, stage] = policy
+    ~end
     return fhpolicy
 end
 
@@ -93,8 +130,8 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
         throw(ArgumentError("Argument m should be valid Finite Horizon MDP with methods from FiniteHorizonPOMDPs.jl/src/interface.jl implemented. If you are completely sure that you implemented all of them, you should also check if you have defined HorizonLength(::Type{<:MyFHMDP})"))
     end
 
-    fhpolicy = FiniteHorizonValuePolicy(m)
-    util = fill(0., length(stage_states(m, 1)))
+    fhpolicy = FiniteHorizonValuePolicy(m, solver)
+    util = fill(0., length(stage_states(m, horizon(m) + 1)))
 
     @showprogress 1 "Computing..." for stage=horizon(m):-1:1
         if solver.verbose
@@ -103,7 +140,7 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
 
         stage_q, util, pol = valueiterationsolver(m, stage, util)
 
-        fhpolicy = addstagerecord(fhpolicy, stage_q, util, pol, stage)
+        fhpolicy = addstagerecord(fhpolicy, stage_q, util, pol, stage, solver)
 
         if solver.verbose
             println("POLICY\n")

@@ -9,6 +9,10 @@ using POMDPTesting
 using POMDPPolicies: FunctionPolicy
 using POMDPSimulators: stepthrough
 
+@testset "verbose check" begin
+    include("verbosecheck.jl")
+end
+
 @testset "interface" begin
     @test HorizonLength(SimpleGridWorld()) == InfiniteHorizon()
     @test HorizonLength(BabyPOMDP()) == InfiniteHorizon()
@@ -28,4 +32,10 @@ include("instances/1DCustomFHGW.jl")
 
 @testset "Custom Finite Horizon MDP" begin
     include("custom1dtest.jl")
+end
+
+include("instances/Pyramid.jl")
+
+@testset "Pyramid MDP" begin
+    include("pyramidtest.jl")
 end

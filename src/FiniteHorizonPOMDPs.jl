@@ -5,6 +5,7 @@ using POMDPModelTools
 using Random: Random, AbstractRNG
 using NamedTupleTools: merge
 using ProgressMeter: @showprogress
+using POMDPModelTools: SparseTabularMDP
 
 import POMDPLinter: @POMDP_require, @req, @subreq
 import POMDPs: Policy, action
@@ -33,5 +34,4 @@ export
 
 include("valueiteration.jl")
 include("solver.jl")
-
 end
