@@ -33,9 +33,10 @@ jobs:
     - os: windows
   include:
     - stage: "Documentation"
-      julia: 1
+      julia: 1.5
       os: linux
       script:
+        - julia --project --check-bounds=yes -e 'import Pkg; Pkg.build(); Pkg.test("FiniteHorizonPOMDPs"; coverage=true)'
         - julia --project=docs/ -e 'using Pkg; Pkg.instantiate();
                                     Pkg.develop(PackageSpec(path=pwd()))'
         - julia --project=docs/ docs/make.jl
