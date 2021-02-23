@@ -36,7 +36,7 @@ FHPolicy = FiniteHorizonPOMDPs.solve(fhsolver, fhex);
 @test_throws ArgumentError FiniteHorizonPOMDPs.solve(fhsolver, mdp)
 
 # Compare resulting policies
-@test all((FiniteHorizonPOMDPs.action(FHPolicy, s, fhsolver) == action(VIPolicy, s) for s in states(fhex)))
+@test all((FiniteHorizonPOMDPs.action(FHPolicy, s) == action(VIPolicy, s) for s in states(fhex)))
 
 # Compare FHMDP and IHMDP states 
 fh_states = Iterators.flatten([FiniteHorizonPOMDPs.stage_states(fhex, i) for i=1:fhex.horizon + 1])
