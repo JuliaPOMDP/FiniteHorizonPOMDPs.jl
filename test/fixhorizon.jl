@@ -29,5 +29,5 @@ end
 @testset "solver" begin
     fhgw = fixhorizon(SimpleGridWorld(), 3)
     # TODO: Change test to pass without boolean value
-    # @test FiniteHorizonPOMDPs.solve(fhgw)
+    # @test test_solver(FiniteHorizonSolver(), fhgw)
 end

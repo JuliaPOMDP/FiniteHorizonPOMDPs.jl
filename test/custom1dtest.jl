@@ -15,7 +15,7 @@ fhsolver = FiniteHorizonSolver()
 # MDPs initialization
 mdp = CustomFHExample(no_states, _horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
 
-# check implementation of required methods 
+# check implementation of required methods
 # @POMDPLinter.show_requirements FiniteHorizonPOMDPs.solve(fhsolver, mdp)
 
 # initialize the solver
@@ -34,7 +34,7 @@ FHPolicy = FiniteHorizonPOMDPs.solve(fhsolver, mdp);
 # Compare resulting policies
 @test all((FiniteHorizonPOMDPs.action(FHPolicy, s) == action(VIPolicy, s) for s in states(mdp)))
 
-# Compare FHMDP and IHMDP states 
+# Compare FHMDP and IHMDP states
 fh_states = Iterators.flatten([FiniteHorizonPOMDPs.stage_states(mdp, i) for i=1:FiniteHorizonPOMDPs.horizon(mdp) + 1])
 ih_states = states(mdp)
 
