@@ -33,13 +33,22 @@ end
 # Policy constructor
 function FiniteHorizonValuePolicy(m::MDP)
     no_stages = horizon(m) + 1
-    no_states = maximum(length(stage_states(m, i)) for i in 1:no_stages)
-    return FiniteHorizonValuePolicy(zeros(length(actions(m)), no_states, no_stages), zeros(no_states, no_stages), ones(Int64, no_states, no_stages), ordered_actions(m), true, m)
+    no_actions = length(actions(m))
+    qmat = Matrix{Float64}[]
+    util = Vector{Float64}[]
+    policy = Vector{Int64}[]
+    for e=1:no_stages
+        no_states = length(stage_states(m, e)) 
+        push!(qmat, zeros(no_actions, no_states))
+        push!(util, zeros(no_states))
+        push!(policy, ones(Int64, no_states))
+    end
+    return FiniteHorizonValuePolicy(qmat, util, policy, ordered_actions(m), true, m)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
     sidx = stage_stateindex(policy.m, s)
-    aidx = policy.policy[sidx, stage(policy.m, s)]
+    aidx = policy.policy[stage(policy.m, s)][sidx]
     return policy.action_map[aidx]
 end
 
@@ -80,10 +89,10 @@ end
 
 Store record for given stage results to `FiniteHorizonPolicy` and return updated version.
 """
-function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage)    
-    fhpolicy.qmat[:, :, stage] = qmat
-    fhpolicy.util[:, stage] = util
-    fhpolicy.policy[:, stage] = policy
+function addstagerecord(fhpolicy::FiniteHorizonValuePolicy, qmat, util, policy, stage, solver::FiniteHorizonSolver)
+    fhpolicy.qmat[stage] = qmat
+    fhpolicy.util[stage] = util
+    fhpolicy.policy[stage] = policy
     return fhpolicy
 end
 
@@ -94,7 +103,7 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
     end
 
     fhpolicy = FiniteHorizonValuePolicy(m)
-    util = fill(0., length(stage_states(m, 1)))
+    util = zeros(length(stage_states(m, horizon(m) + 1)))
 
     @showprogress 1 "Computing..." for stage=horizon(m):-1:1
         if solver.verbose
@@ -103,16 +112,16 @@ function POMDPs.solve(solver::FiniteHorizonSolver, m::MDP)
 
         stage_q, util, pol = valueiterationsolver(m, stage, util)
 
-        fhpolicy = addstagerecord(fhpolicy, stage_q, util, pol, stage)
+        fhpolicy = addstagerecord(fhpolicy, stage_q, util, pol, stage, solver)
 
         if solver.verbose
             println("POLICY\n")
             println("QMAT")
-            println(fhpolicy.qmat[:, :, stage])
+            println(fhpolicy.qmat[stage])
             println("util")
-            println(fhpolicy.util[:, stage])
+            println(fhpolicy.util[stage])
             println("policy")
-            println(fhpolicy.policy[:, stage])
+            println(fhpolicy.policy[stage])
             println("\n\n\n")
         end
     end

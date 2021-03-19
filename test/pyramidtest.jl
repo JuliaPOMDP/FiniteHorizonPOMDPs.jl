@@ -1,19 +1,18 @@
+using POMDPModelTools
 
-# MDP parameters, ValueIteration minimizes the cost => cost is positive, reward is negative
-no_states = 10
-_horizon = 5
+_horizon = 10
 actions = [:l, :r]
 actionCost = 1.
-actionsImpact = Base.ImmutableDict(:l => -1, :r => 1)
-reward_states = [1, no_states]
+actionsImpact = Base.ImmutableDict(:l => 0, :r => 1)
+reward_states = [[4, 1], [5, 5], [7, 6]]
 reward = -10.
 discount_factor = 1.
-noise = .6
+noise = .3
 
 fhsolver = FiniteHorizonSolver()
 
 # MDPs initialization
-mdp = CustomFHExample(no_states, _horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
+mdp = PyramidMDP(_horizon, actions, actionCost, actionsImpact, reward_states, reward, discount_factor, noise)
 
 # check implementation of required methods 
 # @POMDPLinter.show_requirements FiniteHorizonPOMDPs.solve(fhsolver, mdp)
