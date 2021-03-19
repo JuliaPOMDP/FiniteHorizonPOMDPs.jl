@@ -5,7 +5,7 @@ using FiniteHorizonPOMDPs
 #####################
 # MDP and State types
 #####################
-struct PyramidState 
+struct PyramidState
     position::Int64
     epoch::Int64
 end
@@ -31,36 +31,19 @@ FiniteHorizonPOMDPs.horizon(mdp::PyramidMDP) = mdp.horizon
 # changed elements of POMDPs interface
 ###################################
 
-# Creates (horizon(mdp) - 1) * mdp.no_states states to be evaluated and mdp.no_states sink states
-function POMDPs.states(mdp::PyramidMDP)::Array{PyramidState}
-    mdp_states = PyramidState[]
-    for e=1:horizon(mdp) + 1
-        for i=1:e
-            push!(mdp_states, PyramidState(i, e))
-        end
-    end
-
-    return mdp_states
+# Creates (horizon(mdp) + 1) * mdp.no_states states to be evaluated and mdp.no_states sink states
+function POMDPs.states(mdp::PyramidMDP)
+    return [PyramidState(i, e) for e in 1:horizon(mdp) + 1 for i in 1:e]
 end
 
 POMDPs.stateindex(mdp::PyramidMDP, ss::PyramidState)::Int64 = sum(1:ss.epoch - 1) + ss.position
-POMDPs.isterminal(mdp::PyramidMDP, ss::PyramidState) = FiniteHorizonPOMDPs.stage(mdp, ss) > horizon(mdp) || [ss.epoch, ss.position] in mdp.reward_states
+POMDPs.isterminal(mdp::PyramidMDP, ss::PyramidState) = FiniteHorizonPOMDPs.stage(mdp, ss) > horizon(mdp) || (ss.epoch, ss.position) in mdp.reward_states
 
 # returns transition distributions - works only for 1D Gridworld with possible moves to left and to right
-function POMDPs.transition(mdp::PyramidMDP, ss::PyramidState, a::Symbol)::SparseCat{Vector{PyramidState},Vector{Float64}}    
-    sp = PyramidState[]
-    prob = Float64[]
-
-    # add original transition target and probability
-    position = ss.position + mdp.actionsImpact[a]
-    push!(sp, PyramidState(position, ss.epoch + 1))
-    push!(prob, 1. - mdp.noise)
-
-    # add noise transition target and probability
-    noise_action = a == :l ? :r : :l
-    position = ss.position + mdp.actionsImpact[noise_action]
-    push!(sp, PyramidState(position, ss.epoch + 1))
-    push!(prob, mdp.noise)
+function POMDPs.transition(mdp::PyramidMDP, ss::PyramidState, a::Symbol)::SparseCat
+    sp = (  PyramidState(ss.position + mdp.actionsImpact[a], ss.epoch + 1),
+            PyramidState(ss.position + mdp.actionsImpact[a == :l ? :r : :l], ss.epoch + 1))
+    prob = (1. - mdp.noise, mdp.noise)
 
     return SparseCat(sp, prob)
 end
@@ -68,7 +51,7 @@ end
 
 POMDPs.actions(mdp::PyramidMDP)::Vector{Symbol} = mdp.actions
 POMDPs.actions(mdp::PyramidMDP, ss::PyramidState) = mdp.actions
-POMDPs.actionindex(mdp::PyramidMDP, a::Symbol)::Int64 = findall(x->x==a, POMDPs.actions(mdp))[1]
+POMDPs.actionindex(mdp::PyramidMDP, a::Symbol)::Int64 = findfirst(x->x==a, POMDPs.actions(mdp))
 
 ###############################
 # FiniteHorizonPOMDPs interface
@@ -76,12 +59,7 @@ POMDPs.actionindex(mdp::PyramidMDP, a::Symbol)::Int64 = findall(x->x==a, POMDPs.
 FiniteHorizonPOMDPs.stage(mdp::PyramidMDP, ss::PyramidState) = ss.epoch
 
 function FiniteHorizonPOMDPs.stage_states(mdp::PyramidMDP, stage::Int)
-    mdp_states = PyramidState[]
-    for i=1:stage
-        push!(mdp_states, PyramidState(i, stage))
-    end
-
-    return mdp_states
+    return (PyramidState(i, stage) for i in 1:stage)
 end
 
 FiniteHorizonPOMDPs.stage_stateindex(mdp::PyramidMDP, ss::PyramidState) = ss.position
@@ -90,7 +68,7 @@ FiniteHorizonPOMDPs.stage_stateindex(mdp::PyramidMDP, ss::PyramidState) = ss.pos
 # Forwarded parts of POMDPs interface
 ###############################
 function isreward(mdp::PyramidMDP, ss::PyramidState)::Bool
-    return [ss.epoch, ss.position] in mdp.reward_states
+    return (ss.epoch, ss.position) in mdp.reward_states
 end
 
 function POMDPs.reward(mdp::PyramidMDP, ss::PyramidState, a::Symbol, sp::PyramidState)::Float64
