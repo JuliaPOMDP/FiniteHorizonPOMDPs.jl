@@ -21,34 +21,31 @@ function FiniteHorizonSolver(;verbose::Bool=false)
 end
 
 #TODO: Dosctring
-mutable struct FiniteHorizonValuePolicy{Q<:AbstractArray, U<:AbstractArray, P<:AbstractArray, A, M<:MDP} <: Policy
+mutable struct FiniteHorizonValuePolicy{Q<:Array, U<:Array, P<:Array, A<:Array, M<:MDP} <: Policy
     qmat::Q
-    util::U 
-    policy::P 
-    action_map::Vector{A}
-    include_Q::Bool 
+    util::U
+    policy::P
+    action_map::A
+    include_Q::Bool
     m::M
 end
 
 # Policy constructor
 function FiniteHorizonValuePolicy(m::MDP)
-    no_stages = horizon(m) + 1
+    no_stages = horizon(m)
     no_actions = length(actions(m))
-    qmat = Matrix{Float64}[]
-    util = Vector{Float64}[]
-    policy = Vector{Int64}[]
-    for e=1:no_stages
-        no_states = length(stage_states(m, e)) 
-        push!(qmat, zeros(no_actions, no_states))
-        push!(util, zeros(no_states))
-        push!(policy, ones(Int64, no_states))
-    end
+    
+    qmat =  Array{Matrix{Float64}}(undef, no_stages)
+    util =  Array{Vector{Float64}}(undef, no_stages)
+    policy =  Array{Vector{Int64}}(undef, no_stages)
     return FiniteHorizonValuePolicy(qmat, util, policy, ordered_actions(m), true, m)
 end
 
 function action(policy::FiniteHorizonValuePolicy, s::S) where S
+    stg = stage(policy.m, s)
+    stg == horizon(policy.m) + 1 && return policy.action_map[1]
     sidx = stage_stateindex(policy.m, s)
-    aidx = policy.policy[stage(policy.m, s)][sidx]
+    aidx = policy.policy[stg][sidx]
     return policy.action_map[aidx]
 end
 
