@@ -71,7 +71,7 @@ end
 
 POMDPs.actions(mdp::CustomFHExample)::Vector{Symbol} = mdp.actions
 POMDPs.actions(mdp::CustomFHExample, ss::CustomFHExampleState) = mdp.actions
-POMDPs.actionindex(mdp::CustomFHExample, a::Symbol)::Int64 = findall(x->x==a, POMDPs.actions(mdp))[1]
+POMDPs.actionindex(mdp::CustomFHExample, a::Symbol)::Int64 = findfirst(x->x==a, POMDPs.actions(mdp))
 
 ###############################
 # FiniteHorizonPOMDPs interface

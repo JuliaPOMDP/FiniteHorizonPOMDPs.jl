@@ -48,7 +48,7 @@ end
 
 POMDPs.stateindex(mdp::FHExample, s::FHExampleState)::Int64 = s.position
 POMDPs.actions(mdp::FHExample)::Vector{Symbol} = mdp.actions
-POMDPs.actionindex(mdp::FHExample, a::Symbol)::Int64 = findall(x->x==a, POMDPs.actions(mdp))[1]
+POMDPs.actionindex(mdp::FHExample, a::Symbol)::Int64 = findfirst(x->x==a, POMDPs.actions(mdp))
 POMDPs.discount(mdp::FHExample)::Number = mdp.discount_factor
 
 # returns transition distributions - works only for 1D Gridworld with possible moves to left and to right
