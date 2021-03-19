@@ -14,7 +14,7 @@ function stage_states end
 
 """
     stage_stateindex(m::Union{MDP,POMDP}, ss::MDPState}::Int
-    
+
 Compute the index of the given state in Infinite Horizon for given stage state space.
 """
 function stage_stateindex end
@@ -41,3 +41,10 @@ Return the number of *steps* that will be taken in the (PO)MDP, given it is Fini
 A simulation of a (PO)MDP with `horizon(m) == d` should contain *d+1* states and *d* actions and rewards.
 """
 function horizon end
+
+"""
+    stage_observations(m::Union{MDP,POMDP}, stage::Int)
+
+Infinite Horizon MDP's observation for given stage.
+"""
+function stage_observations end

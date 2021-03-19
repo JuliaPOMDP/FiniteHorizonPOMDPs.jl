@@ -6,6 +6,8 @@ using Random: Random, AbstractRNG
 using NamedTupleTools: merge
 using ProgressMeter: @showprogress
 using POMDPModelTools: SparseTabularMDP
+using BeliefUpdaters
+import BeliefUpdaters: DiscreteBelief
 
 import POMDPLinter: @POMDP_require, @req, @subreq
 import POMDPs: Policy, action
@@ -17,7 +19,11 @@ export
     HorizonLength,
     FiniteHorizon,
     InfiniteHorizon,
-    horizon
+    horizon,
+    stage_observations,
+    stage_obsindex,
+    ordered_stage_states,
+    ordered_stage_observations
 
 include("interface.jl")
 
@@ -26,7 +32,7 @@ export
 
 include("fixhorizon.jl")
 
-export 
+export
     FiniteHorizonSolver,
     FiniteHorizonPolicy,
     solve,
