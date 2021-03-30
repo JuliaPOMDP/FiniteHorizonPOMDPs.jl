@@ -22,10 +22,6 @@ User can either implement:
  - finite horizon MDP using both POMDPs.jl and FiniteHorizonPOMDPs.jl interface functions or
  - infinite horizon MDP and transform it to finite horizon one using `fixhorizon` utility
 
-## Solver
-
-The package contains a `solve(solver::FiniteHorizonSolver, m::MDP)` solver for discrete problems that uses Value Iteration. Its results are stored to `FiniteHorizonPolicy` struct. Examples are defined in `test/instances/...` and use example in specific test files. Results were benchmarked against the value iteration executed on all epochs simultaneously.
-
 ## Interface
 
 - `HorizonLength(::Type{<:Union{MDP,POMDP}) = InfiniteHorizon()`
