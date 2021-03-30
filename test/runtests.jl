@@ -1,17 +1,10 @@
-using FiniteHorizonPOMDPs
 using Test
-using POMDPLinter
-using POMDPModelTools
-using DiscreteValueIteration
-using POMDPs
-using POMDPModels: SimpleGridWorld, BabyPOMDP
 using POMDPTesting
-using POMDPPolicies: FunctionPolicy
-using POMDPSimulators: stepthrough
-
-@testset "verbose check" begin
-    include("verbosecheck.jl")
-end
+using FiniteHorizonPOMDPs
+using POMDPs
+import POMDPModels: SimpleGridWorld, BabyPOMDP
+import POMDPPolicies: FunctionPolicy
+import POMDPSimulators: stepthrough
 
 @testset "interface" begin
     @test HorizonLength(SimpleGridWorld()) == InfiniteHorizon()
@@ -20,22 +13,4 @@ end
 
 @testset "fixhorizon" begin
     include("fixhorizon.jl")
-end
-
-include("instances/1DInfiniteHorizonGridWorld.jl")
-
-@testset "1DFixHorizonGridWorld" begin
-    include("fixhorizon1dtest.jl")
-end
-
-include("instances/1DCustomFHGW.jl")
-
-@testset "Custom Finite Horizon MDP" begin
-    include("custom1dtest.jl")
-end
-
-include("instances/Pyramid.jl")
-
-@testset "Pyramid MDP" begin
-    include("pyramidtest.jl")
 end
