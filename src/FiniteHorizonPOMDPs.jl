@@ -3,11 +3,11 @@ module FiniteHorizonPOMDPs
 using POMDPs
 using POMDPModelTools
 using Random: Random, AbstractRNG
-using ProgressMeter: @showprogress
 using BeliefUpdaters
 
 
 export
+    stage,
     stage_states,
     stage_stateindex,
     HorizonLength,
