@@ -2,6 +2,7 @@ using Test
 using POMDPTesting
 using FiniteHorizonPOMDPs
 using POMDPs
+using POMDPModelTools
 import POMDPModels: SimpleGridWorld, BabyPOMDP
 import POMDPPolicies: FunctionPolicy
 import POMDPSimulators: stepthrough
