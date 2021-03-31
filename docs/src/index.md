@@ -14,14 +14,14 @@ Package supports two ways to do that.
 
 This is achieved without defining any abstract class.
 
-## Solvers
-The FiniteHorizonPOMDPS.jl contains:
-- Finite horizon value iteration solver.
-
-This list is going to be extended with POMDPs solvers in future.
-Solvers may be also moved to separate repositories.
-
 ## Interface
 Finite horizon POMDPs are to be defined using [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl) interface extended with new functions from this package
 
 FiniteHorizonPOMDPs' interface is documented in [Interface Documentation](@ref) section.
+
+
+## Solvers
+Finite horizon MDP problems can be solved using following solver:
+- `FiniteHorizonValueIteration.jl`- Finite horizon value iteration solver.
+
+This list is going to be extended with POMDPs solvers in future.
