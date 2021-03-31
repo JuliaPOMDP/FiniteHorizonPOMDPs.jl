@@ -48,5 +48,6 @@ end
 @testset "solver" begin
     fhgw = fixhorizon(SimpleGridWorld(), 3)
     # TODO: Change test to pass without boolean value
-    # @test test_solver(FiniteHorizonSolver(), fhgw)
+    # Dependencies are destroying testing with this (probably until the repos are registered ?)
+    # @test test_solver(FiniteHorizonSolver(), fhgw) == 9.025
 end
