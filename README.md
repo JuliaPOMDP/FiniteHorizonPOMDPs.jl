@@ -1,4 +1,8 @@
 # FiniteHorizonPOMDPs.jl
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/stable)
+[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/latest)
+[![Coverage Status](https://coveralls.io/repos/github/Omastto1/FiniteHorizonPOMDPs.jl/badge.svg?branch=master)](https://coveralls.io/github/Omastto1/FiniteHorizonPOMDPs.jl?branch=master)
+
 [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl)-compatible interface for defining MDPs and POMDPs with finite horizons
 
 This package aims to provide a standard interface for defining problems with finite horizons.
@@ -11,26 +15,20 @@ The goals are to
 
 Notably, in accordance with goal (4), this package does **not** define something like `AbstractFiniteHorizonPOMDP`.
 
+## Use
+Package offers interface for finite horizon POMDPs.
+Solver currently supports only MDPs.
+User can either implement:
+ - finite horizon MDP using both POMDPs.jl and FiniteHorizonPOMDPs.jl interface functions or
+ - infinite horizon MDP and transform it to finite horizon one using `fixhorizon` utility
+
 ## Interface
 
 - `HorizonLength(::Type{<:Union{MDP,POMDP}) = InfiniteHorizon()`
   - `FiniteHorizon`
   - `InfiniteHorizon`
 
-`horizon(m::Union{MDP,POMDP})::Int`
-
-`stage_states(m::Union{MDP,POMDP}, t::Int)`
-`stage_stateindex(m::Union{MDP,POMDP}, t::Int, s)`
-
-## Value Iteration for discrete problems
-
-The package also contains a solver for discrete problems that uses Value Iteration.  
-So far tested only with 1D GridWorld(`test/instances/...`).  
-
-### Solution approach
-
- Current solution consists of simple solver `mysolve(mdp)` iterating and evaluating epochs and `FiniteHorizonPolicy` struct storing its results. This approach has been tested by comparisson of its results on GridWorld to results of value iteration on all epochs simultaneously. Instance of GridWorld problem is defined in `test/instances/1DFiniteHorizonGridWorld.jl`.
-
-### How to use it
-
- User has to define the Problem using `POMDPs.jl` requirement functions - `POMDPs.isterminal`, `POMDPs.reward`, `POMDPs.actionindex`, `POMDPs.discount` and `POMDPs.transition` (notice that `POMDPs.states`, `POMDPs.actions` and `POMDPs.stateindex` are missing), as well as to implement FiniteHorizonPOMDP functions `FiniteHorizonPOMDPs.stage_states`, `FiniteHorizonPOMDPs.stage_actions` and `FiniteHorizonPOMDPs.stage_stateindex`.
+ - `horizon(m::Union{MDP,POMDP})::Int`  
+ - `stage_states(m::Union{MDP,POMDP}, stage::Int)`   
+ - `stage_stateindex(m::Union{MDP,POMDP}, state)`  
+ - `stage(m::Union{MDP,POMDP}, state)`  

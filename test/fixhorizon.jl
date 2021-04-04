@@ -26,8 +26,28 @@ end
     @test length(collect(stepthrough(fhb, FunctionPolicy(s->true)))) == 2
 end
 
+@testset "fixhorizon General" begin
+    m = BabyPOMDP()
+    fhb = fixhorizon(m, 3)
+    state = (false, 2)
+    action = true
+
+    states = [(false, 2), (true, 2)]
+    @test stateindex(fhb, ordered_states(fhb)[3]) == 3
+    @test stage_stateindex(fhb, ordered_states(fhb)[3]) == 1
+    @test ordered_states(fhb)[3] == state
+    @test ordered_stage_states(fhb, 2) == [(false, 2), (true, 2)]
+
+    obs = [(false, 2), (true, 2)]
+    @test collect(first(obs) for obs in stage_observations(fhb, 1)) == collect(observations(m))
+    @test obsindex(fhb, obs[2]) == 4
+    @test stage_obsindex(fhb, obs[2]) == 2
+    @test ordered_stage_observations(fhb, 2) == [(false, 2), (true, 2)]
+end
+
 @testset "solver" begin
     fhgw = fixhorizon(SimpleGridWorld(), 3)
     # TODO: Change test to pass without boolean value
-    # @test FiniteHorizonPOMDPs.solve(fhgw)
+    # Dependencies are destroying testing with this (probably until the repos are registered ?)
+    # @test test_solver(FiniteHorizonSolver(), fhgw) == 9.025
 end

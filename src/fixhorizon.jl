@@ -58,12 +58,12 @@ end
 
 Mark the state as terminal if its stage number if greater than horizon, else let the Infinite Horizon MDP's `isterminal` method decide.
 """
-POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = stage(ss) > horizon(w) || isterminal(w.m, first(ss))
+POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = stage(w, ss) > horizon(w) || isterminal(w.m, first(ss))
 
 function POMDPs.gen(w::FHWrapper, ss::Tuple{<:Any,Int}, a, rng::AbstractRNG)
     out = gen(w.m, first(ss), a, rng)
     if haskey(out, :sp)
-        return merge(out, (sp=(out.sp, stage(ss)+1),))
+        return merge(out, (sp=(out.sp, stage(w, ss)+1),))
     else
         return out
     end
@@ -74,7 +74,7 @@ end
 
 Wrap the transition result of Infinite Horizon MDP with stage number.
 """
-POMDPs.transition(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = InStageDistribution(transition(w.m, first(ss), a), stage(ss)+1)
+POMDPs.transition(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = InStageDistribution(transition(w.m, first(ss), a), stage(w, ss)+1)
 # TODO: convert_s
 
 POMDPs.actions(w::FHWrapper, ss::Tuple{<:Any,Int}) = actions(w.m, first(ss))
@@ -93,15 +93,22 @@ Create a product of Infinite Horizon MDP's observations with all not-terminal st
 """
 POMDPs.observations(w::FixedHorizonPOMDPWrapper) = Iterators.product(observations(w.m), 1:horizon(w))
 
+stage_observations(w::FixedHorizonPOMDPWrapper, stage::Int) = Iterators.product(observations(w.m), stage)
+
+stage_obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any,Int}) = obsindex(w.m, first(o))
+
 # TODO: Write Docstring
-POMDPs.obsindex
+function POMDPs.obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any, Int})
+    s, k = o
+    return (k-1)*length(stage_observations(w, 1)) + obsindex(w.m, s)
+end
 
 """
     POMDPs.observation(w::FixedHorizonPOMDPWrapper[, ss::Tuple{<:Any,Int}], a, ssp::Tuple{<:Any, Int})
 
 Create a product of Infinite Horizon MDP's observations given destination state and action (and original state) with original state's stage.
 """
-POMDPs.observation(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(ss))
+POMDPs.observation(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(w, ss))
 POMDPs.observation(w::FixedHorizonPOMDPWrapper, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, a, first(ssp)), last(ssp)-1)
 
 """
@@ -115,16 +122,16 @@ POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialob
 ###############################
 # FiniteHorizonPOMDPs interface
 ###############################
-stage(ss::Tuple{<:Any,Int}) = last(ss)
+stage(w::FHWrapper, ss::Tuple{<:Any,Int}) = last(ss)
 stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
 stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}) = stateindex(w.m, first(ss))
 
 ###############################
 # Forwarded parts of POMDPs interface
 ###############################
-POMDPs.reward(w::FHWrapper, ss, a, ssp) = reward(w.m, first(ss), a, first(ssp))
+POMDPs.reward(w::FHWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any,Int}) = reward(w.m, first(ss), a, first(ssp))
 POMDPs.reward(w::FixedHorizonPOMDPWrapper, ss, a, ssp, so) = reward(w.m, first(ss), a, first(ssp), first(so))
-POMDPs.reward(w::FHWrapper, ss, a) = reward(w.m, first(ss), a)
+POMDPs.reward(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = reward(w.m, first(ss), a)
 POMDPs.actions(w::FHWrapper) = actions(w.m)
 POMDPs.actionindex(w::FHWrapper, a) = actionindex(w.m, a)
 POMDPs.discount(w::FHWrapper) = discount(w.m)
@@ -134,9 +141,15 @@ POMDPModelTools.ordered_actions(w::FHWrapper) = ordered_actions(w.m)
 #################################
 # distribution with a fixed stage
 #################################
+
+# TODO: Define access functions for InStageDistribution - to access with method instead of .d or .stage
 struct InStageDistribution{D}
     d::D
     stage::Int
+end
+
+function BeliefUpdaters.DiscreteBelief(pomdp, b::InStageDistribution; check::Bool=true)
+    return DiscreteBelief(pomdp, b.d; check)
 end
 
 Base.rand(rng::AbstractRNG, s::Random.SamplerTrivial{<:InStageDistribution}) = (rand(rng, s[].d), s[].stage)
@@ -153,3 +166,6 @@ end
 POMDPs.mean(d::InStageDistribution) = (mean(d.d), d.stage)
 POMDPs.mode(d::InStageDistribution) = (mode(d.d), d.stage)
 POMDPs.support(d::InStageDistribution) = Iterators.product(support(d.d), d.stage)
+
+ordered_stage_states(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(statetype(typeof(w)), s->stage_stateindex(w,s), stage_states(w, stage), "stage_state")
+ordered_stage_observations(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(obstype(typeof(w)), o->stage_obsindex(w,o), stage_observations(w, stage), "stage_observation")
