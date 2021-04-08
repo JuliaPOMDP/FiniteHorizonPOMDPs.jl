@@ -166,6 +166,7 @@ end
 POMDPs.mean(d::InStageDistribution) = (mean(d.d), d.stage)
 POMDPs.mode(d::InStageDistribution) = (mode(d.d), d.stage)
 POMDPs.support(d::InStageDistribution) = Iterators.product(support(d.d), d.stage)
+POMDPs.rand(r::AbstractRNG, d::FiniteHorizonPOMDPs.InStageDistribution) = (rand(r, d.d), d.stage)
 
 ordered_stage_states(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(statetype(typeof(w)), s->stage_stateindex(w,s), stage_states(w, stage), "stage_state")
 ordered_stage_observations(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(obstype(typeof(w)), o->stage_obsindex(w,o), stage_observations(w, stage), "stage_observation")
