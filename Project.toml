@@ -1,7 +1,7 @@
 name = "FiniteHorizonPOMDPs"
 uuid = "8a13bbfe-798e-11e9-2f1c-eba9ee5ef093"
 authors = ["Tomas Omasta <omastto1@fel.cvut.cz> and contributors"]
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 BeliefUpdaters = "8bb6e9a1-7d73-552c-a44a-e5dc5634aac4"
