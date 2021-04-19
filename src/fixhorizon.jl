@@ -169,7 +169,7 @@ end
 
 Return distrubution wrapped in InStageDistribution without stage
 """
-function distrib(d::InStageDistribution{D})::D
+function distrib(d::InStageDistribution)
     return d.d
 end
 
