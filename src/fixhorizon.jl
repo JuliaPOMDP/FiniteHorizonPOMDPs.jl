@@ -119,7 +119,7 @@ end
 Create a product of Infinite Horizon MDP's observations given destination state and action (and original state) with original state's stage.
 """
 POMDPs.observation(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(w, ss))
-POMDPs.observation(w::FixedHorizonPOMDPWrapper, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, a, first(ssp)), stage(ssp)-1)
+POMDPs.observation(w::FixedHorizonPOMDPWrapper, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, a, first(ssp)), stage(w, ssp)-1)
 
 """
     POMDPs.initialstate(w::FHWrapper)
