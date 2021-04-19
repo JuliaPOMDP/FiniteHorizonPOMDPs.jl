@@ -1,25 +1,4 @@
 """
-    stage(m::Union{MDP,POMDP}, ss::MDPState)::Int
-
-Return number of state's stage
-"""
-function stage end
-
-"""
-    stage_states(m::Union{MDP,POMDP}, stage::Int)
-
-Create Infinite Horizon MDP's states for given stage.
-"""
-function stage_states end
-
-"""
-    stage_stateindex(m::Union{MDP,POMDP}, ss::MDPState}::Int
-
-Compute the index of the given state in Infinite Horizon for given stage state space.
-"""
-function stage_stateindex end
-
-"""
     HorizonLength(::Type{<:Union{MDP,POMDP})
     HorizonLength(::Union{MDP,POMDP})
 
@@ -43,8 +22,52 @@ A simulation of a (PO)MDP with `horizon(m) == d` should contain *d+1* states and
 function horizon end
 
 """
+    stage(m::Union{MDP,POMDP}, ss)::Int
+    stage(m::Union{MDP,POMDP}, o)::Int
+    stage(d)::Int
+
+Considering a variable or distribution containing its stage assignment, return the number of its stage.
+"""
+function stage end
+
+"""
+    stage_states(m::Union{MDP,POMDP}, stage::Int)
+
+Create (PO)MDP's states for given stage.
+"""
+function stage_states end
+
+"""
+    stage_stateindex(m::Union{MDP,POMDP}, ss}::Int
+
+Compute the index of the given state in the corresponding stage.
+"""
+function stage_stateindex end
+
+"""
+    ordered_stage_states(w::FHWrapper, stage::Int)
+
+Return an AbstractVector of states from given stage ordered according to stage_stateindex(mdp, s).
+"""
+function ordered_stage_states end
+
+"""
     stage_observations(m::Union{MDP,POMDP}, stage::Int)
 
-Infinite Horizon MDP's observation for given stage.
+Create (PO)MDP's observations for given stage.
 """
 function stage_observations end
+
+"""
+    stage_obsindex(m::Union{MDP,POMDP}, o::stage::Int)
+
+Compute the index of the given observation in the corresponding stage.
+"""
+function stage_obsindex end
+
+"""
+    ordered_stage_observations(w::FHWrapper, stage::Int)
+
+Return an AbstractVector of observations from given stage ordered according to stage_obsindex(w,o).
+"""
+function ordered_stage_observations end

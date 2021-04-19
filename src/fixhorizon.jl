@@ -1,4 +1,3 @@
-# TODO: Docstring
 """
     fixhorizon(m::Union{MDP,POMDP}, horizon::Int)
 
@@ -60,6 +59,11 @@ Mark the state as terminal if its stage number if greater than horizon, else let
 """
 POMDPs.isterminal(w::FHWrapper, ss::Tuple{<:Any,Int}) = stage(w, ss) > horizon(w) || isterminal(w.m, first(ss))
 
+"""
+    POMDPs.gen(w::FHWrapper, ss::Tuple{<:Any,Int}, a, rng::AbstractRNG)
+
+Implement the entire MDP/POMDP generative model by returning a NamedTuple.
+"""
 function POMDPs.gen(w::FHWrapper, ss::Tuple{<:Any,Int}, a, rng::AbstractRNG)
     out = gen(w.m, first(ss), a, rng)
     if haskey(out, :sp)
@@ -77,6 +81,12 @@ Wrap the transition result of Infinite Horizon MDP with stage number.
 POMDPs.transition(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = InStageDistribution(transition(w.m, first(ss), a), stage(w, ss)+1)
 # TODO: convert_s
 
+"""
+    POMDPs.actions(w::FHWrapper, ss::Tuple{<:Any,Int})
+
+Return the actions of Infinite Horizon (PO)MDP.
+This method assumes similar actions for all stages.
+"""
 POMDPs.actions(w::FHWrapper, ss::Tuple{<:Any,Int}) = actions(w.m, first(ss))
 
 """
@@ -93,12 +103,12 @@ Create a product of Infinite Horizon MDP's observations with all not-terminal st
 """
 POMDPs.observations(w::FixedHorizonPOMDPWrapper) = Iterators.product(observations(w.m), 1:horizon(w))
 
-stage_observations(w::FixedHorizonPOMDPWrapper, stage::Int) = Iterators.product(observations(w.m), stage)
+"""
+    POMDPs.obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any, Int})::Int
 
-stage_obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any,Int}) = obsindex(w.m, first(o))
-
-# TODO: Write Docstring
-function POMDPs.obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any, Int})
+Compute the index of the given observation in the Finite Horizon observation space (meaning in observation space of all stages).
+"""
+function POMDPs.obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any, Int})::Int
     s, k = o
     return (k-1)*length(stage_observations(w, 1)) + obsindex(w.m, s)
 end
@@ -125,6 +135,10 @@ POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialob
 stage(w::FHWrapper, ss::Tuple{<:Any,Int}) = last(ss)
 stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
 stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}) = stateindex(w.m, first(ss))
+stage_observations(w::FixedHorizonPOMDPWrapper, stage::Int) = Iterators.product(observations(w.m), stage)
+stage_obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any,Int}) = obsindex(w.m, first(o))
+ordered_stage_states(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(statetype(typeof(w)), s->stage_stateindex(w,s), stage_states(w, stage), "stage_state")
+ordered_stage_observations(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(obstype(typeof(w)), o->stage_obsindex(w,o), stage_observations(w, stage), "stage_observation")
 
 ###############################
 # Forwarded parts of POMDPs interface
@@ -135,14 +149,17 @@ POMDPs.reward(w::FHWrapper, ss::Tuple{<:Any,Int}, a) = reward(w.m, first(ss), a)
 POMDPs.actions(w::FHWrapper) = actions(w.m)
 POMDPs.actionindex(w::FHWrapper, a) = actionindex(w.m, a)
 POMDPs.discount(w::FHWrapper) = discount(w.m)
-POMDPModelTools.ordered_actions(w::FHWrapper) = ordered_actions(w.m)
 # TODO: convert_a
 
 #################################
 # distribution with a fixed stage
 #################################
+"""
+    InStageDistribution{D}
 
 # TODO: Define access functions for InStageDistribution - to access with method instead of .d or .stage
+Wrap given distribution with a given stage
+"""
 struct InStageDistribution{D}
     d::D
     stage::Int
@@ -168,5 +185,7 @@ POMDPs.mode(d::InStageDistribution) = (mode(d.d), d.stage)
 POMDPs.support(d::InStageDistribution) = Iterators.product(support(d.d), d.stage)
 POMDPs.rand(r::AbstractRNG, d::FiniteHorizonPOMDPs.InStageDistribution) = (rand(r, d.d), d.stage)
 
-ordered_stage_states(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(statetype(typeof(w)), s->stage_stateindex(w,s), stage_states(w, stage), "stage_state")
-ordered_stage_observations(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(obstype(typeof(w)), o->stage_obsindex(w,o), stage_observations(w, stage), "stage_observation")
+#################################
+# POMDPModelTools ordered actions
+#################################
+POMDPModelTools.ordered_actions(w::FHWrapper) = ordered_actions(w.m)
