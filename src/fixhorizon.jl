@@ -119,7 +119,7 @@ end
 Create a product of Infinite Horizon MDP's observations given destination state and action (and original state) with original state's stage.
 """
 POMDPs.observation(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(w, ss))
-POMDPs.observation(w::FixedHorizonPOMDPWrapper, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, a, first(ssp)), last(ssp)-1)
+POMDPs.observation(w::FixedHorizonPOMDPWrapper, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, a, first(ssp)), stage(ssp)-1)
 
 """
     POMDPs.initialstate(w::FHWrapper)
@@ -157,7 +157,6 @@ POMDPs.discount(w::FHWrapper) = discount(w.m)
 """
     InStageDistribution{D}
 
-# TODO: Define access functions for InStageDistribution - to access with method instead of .d or .stage
 Wrap given distribution with a given stage
 """
 struct InStageDistribution{D}
@@ -165,25 +164,45 @@ struct InStageDistribution{D}
     stage::Int
 end
 
+"""
+    distrib(d::InStageDistribution{D})::D
+
+Return distrubution wrapped in InStageDistribution without stage
+"""
+function distrib(d::InStageDistribution{D})::D
+    return d.d
+end
+
+"""
+    stage(d::InStageDistribution)
+
+Return stage of InStageDistribution
+"""
+stage(d::InStageDistribution) = d.stage
+
+
+# convert(::Type{Array{Float64, 1}}, d::FiniteHorizonPOMDPs.InStageDistribution{DiscreteUniform}, m::FiniteHorizonPOMDPs.FixedHorizonPOMDPWrapper) = vec([pdf(d, s) for s in states(m)])
+# convert(::Type{Array{Float64, 1}}, d::FiniteHorizonPOMDPs.InStageDistribution{BoolDistribution}, m::FiniteHorizonPOMDPs.FixedHorizonPOMDPWrapper) = [[distrib(d).p[1], 1 - distrib(d).p[1]]..., zeros(length(states(m)) - 2)...]
+
 function BeliefUpdaters.DiscreteBelief(pomdp, b::InStageDistribution; check::Bool=true)
-    return DiscreteBelief(pomdp, b.d; check)
+    return DiscreteBelief(pomdp, convert(Array{Float64, 1}, b, pomdp); check)
 end
 
 Base.rand(rng::AbstractRNG, s::Random.SamplerTrivial{<:InStageDistribution}) = (rand(rng, s[].d), s[].stage)
 
 function POMDPs.pdf(d::InStageDistribution, ss::Tuple{<:Any, Int})
     s, k = ss
-    if k == d.stage
-        return pdf(d.d, s)
+    if k == stage(d)
+        return pdf(distrib(d), s)
     else
         return 0.0
     end
 end
 
-POMDPs.mean(d::InStageDistribution) = (mean(d.d), d.stage)
-POMDPs.mode(d::InStageDistribution) = (mode(d.d), d.stage)
-POMDPs.support(d::InStageDistribution) = Iterators.product(support(d.d), d.stage)
-POMDPs.rand(r::AbstractRNG, d::FiniteHorizonPOMDPs.InStageDistribution) = (rand(r, d.d), d.stage)
+POMDPs.mean(d::InStageDistribution) = (mean(distrib(d)), stage(d))
+POMDPs.mode(d::InStageDistribution) = (mode(distrib(d)), stage(d))
+POMDPs.support(d::InStageDistribution) = Iterators.product(support(distrib(d)), stage(d))
+POMDPs.rand(r::AbstractRNG, d::FiniteHorizonPOMDPs.InStageDistribution) = (rand(r, distrib(d)), stage(d))
 
 #################################
 # POMDPModelTools ordered actions
