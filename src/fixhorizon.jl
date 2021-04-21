@@ -180,14 +180,6 @@ Return stage of InStageDistribution
 """
 stage(d::InStageDistribution) = d.stage
 
-
-# convert(::Type{Array{Float64, 1}}, d::FiniteHorizonPOMDPs.InStageDistribution{DiscreteUniform}, m::FiniteHorizonPOMDPs.FixedHorizonPOMDPWrapper) = vec([pdf(d, s) for s in states(m)])
-# convert(::Type{Array{Float64, 1}}, d::FiniteHorizonPOMDPs.InStageDistribution{BoolDistribution}, m::FiniteHorizonPOMDPs.FixedHorizonPOMDPWrapper) = [[distrib(d).p[1], 1 - distrib(d).p[1]]..., zeros(length(states(m)) - 2)...]
-
-function BeliefUpdaters.DiscreteBelief(pomdp, b::InStageDistribution; check::Bool=true)
-    return DiscreteBelief(pomdp, convert(Array{Float64, 1}, b, pomdp); check)
-end
-
 Base.rand(rng::AbstractRNG, s::Random.SamplerTrivial{<:InStageDistribution}) = (rand(rng, s[].d), s[].stage)
 
 function POMDPs.pdf(d::InStageDistribution, ss::Tuple{<:Any, Int})

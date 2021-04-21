@@ -3,7 +3,6 @@ module FiniteHorizonPOMDPs
 using POMDPs
 using POMDPModelTools
 using Random: Random, AbstractRNG
-using BeliefUpdaters
 
 
 export
