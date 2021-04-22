@@ -165,11 +165,11 @@ struct InStageDistribution{D}
 end
 
 """
-    distrib(d::InStageDistribution{D})::D
+    distribution(d::InStageDistribution{D})::D
 
 Return distrubution wrapped in InStageDistribution without stage
 """
-function distrib(d::InStageDistribution)
+function distribution(d::InStageDistribution)
     return d.d
 end
 
@@ -185,16 +185,16 @@ Base.rand(rng::AbstractRNG, s::Random.SamplerTrivial{<:InStageDistribution}) = (
 function POMDPs.pdf(d::InStageDistribution, ss::Tuple{<:Any, Int})
     s, k = ss
     if k == stage(d)
-        return pdf(distrib(d), s)
+        return pdf(distribution(d), s)
     else
         return 0.0
     end
 end
 
-POMDPs.mean(d::InStageDistribution) = (mean(distrib(d)), stage(d))
-POMDPs.mode(d::InStageDistribution) = (mode(distrib(d)), stage(d))
-POMDPs.support(d::InStageDistribution) = Iterators.product(support(distrib(d)), stage(d))
-POMDPs.rand(r::AbstractRNG, d::FiniteHorizonPOMDPs.InStageDistribution) = (rand(r, distrib(d)), stage(d))
+POMDPs.mean(d::InStageDistribution) = (mean(distribution(d)), stage(d))
+POMDPs.mode(d::InStageDistribution) = (mode(distribution(d)), stage(d))
+POMDPs.support(d::InStageDistribution) = Iterators.product(support(distribution(d)), stage(d))
+POMDPs.rand(r::AbstractRNG, d::FiniteHorizonPOMDPs.InStageDistribution) = (rand(r, distribution(d)), stage(d))
 
 #################################
 # POMDPModelTools ordered actions
