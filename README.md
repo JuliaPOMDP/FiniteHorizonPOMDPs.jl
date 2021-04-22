@@ -15,20 +15,39 @@ The goals are to
 
 Notably, in accordance with goal (4), this package does **not** define something like `AbstractFiniteHorizonPOMDP`.
 
-## Use
+## Usage
 Package offers interface for finite horizon POMDPs.
 Solver currently supports only MDPs.
 User can either implement:
  - finite horizon MDP using both POMDPs.jl and FiniteHorizonPOMDPs.jl interface functions or
  - infinite horizon MDP and transform it to finite horizon one using `fixhorizon` utility
 
+ ```
+ using FiniteHorizonPOMDPs
+ import POMDPModels
+
+ gw = SimpleGridWorld()    # initialize Infinite Horizon model
+ fhgw = fixhorizon(gw, 2)  # use fixhorizon utility to transform it to Finite Horizon
+ ```
+
 ## Interface
 
-- `HorizonLength(::Type{<:Union{MDP,POMDP}) = InfiniteHorizon()`
-  - `FiniteHorizon`
-  - `InfiniteHorizon`
+ - `HorizonLength(::Type{<:Union{MDP,POMDP})`
+    - Checks whether MDP is Finite or Infinite Horizon and return corresponding struct (FiniteHorizon or InfiniteHorizon).    
 
  - `horizon(m::Union{MDP,POMDP})::Int`  
+    - Returns the number of *steps* that will be taken in the (PO)MDP, given it is Finite Horizon.
+ - `stage(m::Union{MDP,POMDP}, ss)::Int`
+    - Returns the number of input variable's stage.
  - `stage_states(m::Union{MDP,POMDP}, stage::Int)`   
+    - Creates (PO)MDP's states for given stage.
  - `stage_stateindex(m::Union{MDP,POMDP}, state)`  
- - `stage(m::Union{MDP,POMDP}, state)`  
+    - Computes the index of the given state in the corresponding stage.
+ - `ordered_stage_states(w::FHWrapper, stage::Int)`
+    - Returns an `AbstractVector` of states from given stage ordered according to `stage_stateindex(mdp, s)`.
+ - `stage_observations(m::Union{MDP,POMDP}, stage::Int)`
+    - Creates (PO)MDP's observations for given stage.
+ - `stage_obsindex(m::Union{MDP,POMDP}, o::stage::Int)`
+    - Computes the index of the given observation in the corresponding stage.
+ - `ordered_stage_observations(w::FHWrapper, stage::Int)`
+    - Returns an `AbstractVector` of observations from given stage ordered according to `stage_obsindex(w,o)`.

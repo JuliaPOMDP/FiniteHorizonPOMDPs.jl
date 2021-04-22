@@ -3,20 +3,19 @@ module FiniteHorizonPOMDPs
 using POMDPs
 using POMDPModelTools
 using Random: Random, AbstractRNG
-using BeliefUpdaters
 
 
 export
-    stage,
-    stage_states,
-    stage_stateindex,
     HorizonLength,
     FiniteHorizon,
     InfiniteHorizon,
     horizon,
+    stage,
+    stage_states,
+    stage_stateindex,
+    ordered_stage_states,
     stage_observations,
     stage_obsindex,
-    ordered_stage_states,
     ordered_stage_observations
 
 include("interface.jl")
