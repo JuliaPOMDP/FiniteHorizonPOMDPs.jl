@@ -1,7 +1,7 @@
 module FiniteHorizonPOMDPs
 
 using POMDPs
-using POMDPModelTools
+using POMDPTools
 using Random: Random, AbstractRNG
 
 
