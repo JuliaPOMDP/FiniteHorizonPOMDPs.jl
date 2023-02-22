@@ -1,11 +1,8 @@
 using Test
-using POMDPTesting
 using FiniteHorizonPOMDPs
 using POMDPs
-using POMDPModelTools
+using POMDPTools
 import POMDPModels: SimpleGridWorld, BabyPOMDP
-import POMDPPolicies: FunctionPolicy
-import POMDPSimulators: stepthrough
 
 @testset "interface" begin
     @test HorizonLength(SimpleGridWorld()) == InfiniteHorizon()

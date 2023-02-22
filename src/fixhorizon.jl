@@ -137,8 +137,22 @@ stage_states(w::FHWrapper, stage::Int) = Iterators.product(states(w.m), stage)
 stage_stateindex(w::FHWrapper, ss::Tuple{<:Any,Int}) = stateindex(w.m, first(ss))
 stage_observations(w::FixedHorizonPOMDPWrapper, stage::Int) = Iterators.product(observations(w.m), stage)
 stage_obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any,Int}) = obsindex(w.m, first(o))
-ordered_stage_states(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(statetype(typeof(w)), s->stage_stateindex(w,s), stage_states(w, stage), "stage_state")
-ordered_stage_observations(w::FHWrapper, stage::Int) = POMDPModelTools.ordered_vector(obstype(typeof(w)), o->stage_obsindex(w,o), stage_observations(w, stage), "stage_observation")
+function ordered_stage_states(w::FHWrapper, stage::Int)
+    return POMDPTools.ModelTools.ordered_vector(
+        statetype(typeof(w)),
+        s -> stage_stateindex(w,s),
+        stage_states(w, stage),
+        "stage_state"
+    )
+end
+function ordered_stage_observations(w::FHWrapper, stage::Int)
+    return POMDPTools.ModelTools.ordered_vector(
+        obstype(typeof(w)),
+        o -> stage_obsindex(w,o),
+        stage_observations(w, stage),
+        "stage_observation"
+    )
+end
 
 ###############################
 # Forwarded parts of POMDPs interface
@@ -199,4 +213,4 @@ POMDPs.rand(r::AbstractRNG, d::FiniteHorizonPOMDPs.InStageDistribution) = (rand(
 #################################
 # POMDPModelTools ordered actions
 #################################
-POMDPModelTools.ordered_actions(w::FHWrapper) = ordered_actions(w.m)
+POMDPTools.ordered_actions(w::FHWrapper) = ordered_actions(w.m)
