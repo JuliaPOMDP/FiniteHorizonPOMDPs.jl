@@ -2,13 +2,13 @@ using Test
 using FiniteHorizonPOMDPs
 using POMDPs
 using POMDPTools
-import POMDPModels: SimpleGridWorld, BabyPOMDP
+using POMDPModels
 
 @testset "interface" begin
     @test HorizonLength(SimpleGridWorld()) == InfiniteHorizon()
     @test HorizonLength(BabyPOMDP()) == InfiniteHorizon()
 end
 
-@testset "fixhorizon" begin
+@testset "fixhorizon" verbose=true begin
     include("fixhorizon.jl")
 end

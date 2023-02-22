@@ -10,7 +10,7 @@
     @test horizon(fhgw) == 2
     @test has_consistent_distributions(fhgw)
     is = (convert(statetype(gw), [1,1]), 1)::statetype(fhgw)
-    @show actiontype(fhgw)
+    # @show actiontype(fhgw)
     @test length(collect(stepthrough(fhgw, FunctionPolicy(s->:left), is, "s,a,r,sp"))) == 2
 end
 
@@ -43,6 +43,27 @@ end
     @test obsindex(fhb, obs[2]) == 4
     @test stage_obsindex(fhb, obs[2]) == 2
     @test ordered_stage_observations(fhb, 2) == [(false, 2), (true, 2)]
+end
+
+
+@testset "inbounds obs" begin
+    pomdp = TigerPOMDP()
+    fpomdp = fixhorizon(pomdp, 3)
+    S = states(fpomdp)
+    A = actions(fpomdp)
+    O = observations(fpomdp)
+    n_o = length(O)
+
+    for a ∈ A
+        for sp ∈ S
+            Z = observation(fpomdp, a, sp)
+            for (o,p) ∈ weighted_iterator(Z)
+                @test o ∈ O
+                @test 1 ≤ obsindex(fpomdp, o) ≤ n_o
+            end
+        end
+    end
+    @test SparseTabularPOMDP(fpomdp) isa SparseTabularPOMDP
 end
 
 @testset "solver" begin

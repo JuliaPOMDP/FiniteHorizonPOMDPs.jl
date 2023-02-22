@@ -101,7 +101,7 @@ POMDPs.initialstate(w::FHWrapper) = InStageDistribution(initialstate(w.m), 1)
 
 Create a product of Infinite Horizon MDP's observations with all not-terminal stages (`1:horizon(w)`).
 """
-POMDPs.observations(w::FixedHorizonPOMDPWrapper) = Iterators.product(observations(w.m), 1:horizon(w))
+POMDPs.observations(w::FixedHorizonPOMDPWrapper) = Iterators.product(observations(w.m), 1:horizon(w)+1)
 
 """
     POMDPs.obsindex(w::FixedHorizonPOMDPWrapper, o::Tuple{<:Any, Int})::Int
@@ -118,8 +118,13 @@ end
 
 Create a product of Infinite Horizon MDP's observations given destination state and action (and original state) with original state's stage.
 """
-POMDPs.observation(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(w, ss))
-POMDPs.observation(w::FixedHorizonPOMDPWrapper, a, ssp::Tuple{<:Any, Int}) = InStageDistribution(observation(w.m, a, first(ssp)), stage(w, ssp)-1)
+function POMDPs.observation(w::FixedHorizonPOMDPWrapper{S}, ss::Tuple{S,Int}, a, ssp::Tuple{S, Int}) where S
+    InStageDistribution(observation(w.m, first(ss), a, first(ssp)), stage(w, ssp))
+end
+
+function POMDPs.observation(w::FixedHorizonPOMDPWrapper{S}, a, ssp::Tuple{S, Int}) where S
+    InStageDistribution(observation(w.m, a, first(ssp)), stage(w, ssp))
+end
 
 """
     POMDPs.initialstate(w::FHWrapper)
