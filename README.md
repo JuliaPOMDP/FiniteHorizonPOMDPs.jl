@@ -1,7 +1,7 @@
 # FiniteHorizonPOMDPs.jl
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/stable)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://Omastto1.github.io/FiniteHorizonPOMDPs.jl/latest)
-[![Coverage Status](https://coveralls.io/repos/github/Omastto1/FiniteHorizonPOMDPs.jl/badge.svg?branch=master)](https://coveralls.io/github/Omastto1/FiniteHorizonPOMDPs.jl?branch=master)
+[![codecov](https://codecov.io/gh/JuliaPOMDP/FiniteHorizonPOMDPs.jl/branch/master/graph/badge.svg?token=09h0DS1ubi)](https://codecov.io/gh/JuliaPOMDP/FiniteHorizonPOMDPs.jl)
 
 [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl)-compatible interface for defining MDPs and POMDPs with finite horizons
 
@@ -22,9 +22,9 @@ User can either implement:
  - finite horizon MDP using both POMDPs.jl and FiniteHorizonPOMDPs.jl interface functions or
  - infinite horizon MDP and transform it to finite horizon one using `fixhorizon` utility
 
- ```
+ ```julia
  using FiniteHorizonPOMDPs
- import POMDPModels
+ using POMDPModels
 
  gw = SimpleGridWorld()    # initialize Infinite Horizon model
  fhgw = fixhorizon(gw, 2)  # use fixhorizon utility to transform it to Finite Horizon
