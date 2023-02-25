@@ -131,7 +131,9 @@ end
 
 Return Infinite Horizon MDP's initial observations.
 """
-POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int}) = initialobs(w.m, first(ss))
+function POMDPs.initialobs(w::FixedHorizonPOMDPWrapper, ss::Tuple{<:Any,Int})
+    return InStageDistribution(initialobs(w.m, first(ss)), last(ss))
+end
 # TODO: convert_o
 
 ###############################
