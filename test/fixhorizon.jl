@@ -31,6 +31,12 @@ end
     fhb = fixhorizon(m, 3)
     state = (false, 2)
     action = true
+    b0 = initialstate(fhb)
+    o0 = POMDPs.initialobs(fhb, state)
+    @test o0 isa FiniteHorizonPOMDPs.InStageDistribution
+    @test rand(o0) ∈ observations(fhb)
+    @test first(rand(b0, 10)) isa Tuple{Bool,Int}
+    @test ordered_actions(fhb) == ordered_actions(m)
 
     states = [(false, 2), (true, 2)]
     @test stateindex(fhb, ordered_states(fhb)[3]) == 3
@@ -43,6 +49,25 @@ end
     @test obsindex(fhb, obs[2]) == 4
     @test stage_obsindex(fhb, obs[2]) == 2
     @test ordered_stage_observations(fhb, 2) == [(false, 2), (true, 2)]
+
+    struct PartiallyGenerative <: POMDP{Int,Int,Int} end
+    POMDPs.initialstate(::PartiallyGenerative) = Uniform((0,1))
+    POMDPs.gen(::PartiallyGenerative, s, a, rng) = (;sp=mod(s+a,2))
+    POMDPs.reward(::PartiallyGenerative, s, a) = float(s)
+    POMDPs.observation(::PartiallyGenerative, a, sp) = Deterministic(sp)
+
+    fpg = fixhorizon(PartiallyGenerative(), 2)
+    b0 = initialstate(fpg)
+    s = (0,1)
+    a = 1
+    sp, o, r = @gen(:sp,:o,:r)(fpg, s, a)
+    @test sp isa Tuple{Int,Int}
+    @test o isa Tuple{Int,Int}
+    @test r isa Float64
+    @test reward(fpg, s, a) isa Float64
+
+    @test POMDPs.mean(b0) == (0.5, 1)
+    @test POMDPs.mode(b0) isa Tuple{Int, Int}
 end
 
 
